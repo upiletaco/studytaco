@@ -13,6 +13,7 @@ const MillionaireNavHandler = () => {
     const [currentView, setCurrentView] = useState<ViewState>('home');
     const [gameData, setGameData] = useState<WwbmQuestion[] | null>(null);
     const [title, setTitle] = useState<string>("")
+    const [text, setText] = useState<string>("")
     const router = useRouter()
     const handleViewChange = (view: ViewState) => {
         setCurrentView(view);
@@ -41,10 +42,11 @@ const MillionaireNavHandler = () => {
     // };
 
     const HomeComponent = () => {
-        const onGameDataGenerated = (questions: WwbmQuestion[], title: string) => {
+        const onGameDataGenerated = (questions: WwbmQuestion[], title: string, extractedText: string) => {
             setCurrentView('edit'); // Automatically transition to play view when data is generated
             setTitle(title)
             setGameData(questions)
+            setText(extractedText)
         };
 
         return <WwbmHomePage onQuestionsGenerated={onGameDataGenerated} />;
@@ -61,7 +63,7 @@ const MillionaireNavHandler = () => {
 
         return (
             <div className="relative">
-                <EditMillionaire wwbmQuestions={gameData} title={title} />
+                <EditMillionaire wwbmQuestions={gameData} title={title} text={text} />
                 <button
                     onClick={() => handleViewChange('home')}
                     className="fixed bottom-6 left-6 z-50 bg-blue-500 hover:bg-blue-600 text-white 

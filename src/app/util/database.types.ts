@@ -87,25 +87,39 @@ export type Database = {
         Row: {
           alias: string | null
           created_at: string
+          file_id: string | null
           high_score: number | null
           id: string
           is_public: boolean | null
+          user_id: string | null
         }
         Insert: {
           alias?: string | null
           created_at?: string
+          file_id?: string | null
           high_score?: number | null
           id?: string
           is_public?: boolean | null
+          user_id?: string | null
         }
         Update: {
           alias?: string | null
           created_at?: string
+          file_id?: string | null
           high_score?: number | null
           id?: string
           is_public?: boolean | null
+          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "millionaire_games_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       millionaire_mc_options: {
         Row: {
@@ -218,6 +232,35 @@ export type Database = {
           user?: string | null
         }
         Relationships: []
+      }
+      user_accounts: {
+        Row: {
+          created_at: string
+          id: string
+          username: string | null
+          xp: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          username?: string | null
+          xp?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          username?: string | null
+          xp?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_accounts_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       wwbm_games: {
         Row: {

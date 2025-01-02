@@ -32,7 +32,7 @@ const HowToPlayModal = () => {
             <div className="flex-1 overflow-y-auto">
               <div className="p-6 text-[#FFCC00] space-y-4">
                 <p>
-                  Taco Learn has built an AI Jeopardy game that turns your study materials into an engaging learning experience!
+                  Study Taco has built an AI Jeopardy game that turns your study materials into an engaging learning experience!
                 </p>
 
                 <div className="bg-[#000080]/50 p-4 rounded-lg">

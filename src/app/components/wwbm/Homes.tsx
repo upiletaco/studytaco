@@ -6,6 +6,7 @@ import LoadingText from "../loadingText";
 import HeaderBar from "../HeaderBar";
 import DiscoverGames from "./DiscoverGames";
 import MillionaireUpload from "./MillionaireUpload";
+import UserGames from "./YourGames";
 
 const WwbmHomePage: React.FC<WwbmHomeScreenProps> = ({ onQuestionsGenerated }) => {
     const [files, setFiles] = useState<UploadedFile[]>([]);
@@ -65,7 +66,7 @@ const WwbmHomePage: React.FC<WwbmHomeScreenProps> = ({ onQuestionsGenerated }) =
 
             console.log("Categories to convert to json of type " + typeof (data.questions))
             const title = data.title
-            onQuestionsGenerated(data.questions.questions, title);
+            onQuestionsGenerated(data.questions.questions, title, extractedText);
 
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Error generating questions');
@@ -108,6 +109,8 @@ const WwbmHomePage: React.FC<WwbmHomeScreenProps> = ({ onQuestionsGenerated }) =
                         </div>
                     )}
                 </div>
+
+                <UserGames/>
 
                 <DiscoverGames />
 

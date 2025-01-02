@@ -29,7 +29,7 @@ const GameDashboard = () => {
             <div className="flex items-center justify-between align-middle mt-6">
                 <div>
                     <h1 className="text-4xl font-bold text-gray-800">Welcome to</h1>
-                    <h2 className="text-4xl font-bold text-emerald-400">Taco Learn</h2>
+                    <h2 className="text-4xl font-bold text-emerald-400">Study Taco</h2>
                 </div>
                 <GeometricTaco />
             </div>

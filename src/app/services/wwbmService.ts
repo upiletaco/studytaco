@@ -4,31 +4,37 @@ import { getSupabase } from "./supabaseClient";
 const insertWwbmMatch = async (
     data: WwbmQuestion[],
     title: string,
+    user_id: string | null,
+    text: string,
 ): Promise<string | null> => {
     console.log(`Title in insertBoard: ${title}`);
+
     try {
-        const game_id = await insertWwbmGame(title);
+        const game_id = await insertWwbmGame(title, user_id);
 
         if (game_id == null) {
             console.log("Saving game failed");
             return null;
         }
+
+        insertGameText(game_id, text)
+
+
         console.log(`Game id saved at ${game_id}`);
         for (let i = 0; i < data.length; i++) {
             const question: WwbmQuestion = data[i];
             const question_id = await insertWwbmQuestion(
                 game_id,
-                question.question
-             
+                question.question,
             );
             console.log(`Category saved at ${question_id}`);
             if (question_id == null) return null;
             for (let j = 0; j < question.content.length; j++) {
                 let correct = false;
-                if (question.content[j] == question.correct){
+                if (question.content[j] == question.correct) {
                     correct = true;
                 }
-                await insertWwbmMc(question_id, question.content[j], correct)
+                await insertWwbmMc(question_id, question.content[j], correct);
             }
         }
         return game_id;
@@ -38,11 +44,15 @@ const insertWwbmMatch = async (
     }
 };
 
-const insertWwbmGame = async (title: string): Promise<string | null> => {
+const insertWwbmGame = async (
+    title: string,
+    user_id: string | null,
+): Promise<string | null> => {
     const supabase = getSupabase();
+
     try {
         const { data, error } = await supabase.from("millionaire_games").insert(
-            { "alias": title },
+            { "alias": title, "user_id": user_id },
         ).select().single();
         if (error) throw error;
         return data["id"];
@@ -52,11 +62,41 @@ const insertWwbmGame = async (title: string): Promise<string | null> => {
     }
 };
 
-const insertWwbmQuestion = async (gameId: string, question: string): Promise<string | null> => {
+
+const insertGameText = async(game_id: string, text: string) => {
+    const supabase = getSupabase()
+
+    try {
+        const { data: uploadData, error: uploadError } = await supabase
+ .storage
+ .from('files')
+ .upload(`${game_id}.txt`, text, {
+   contentType: 'text/plain'
+ })
+
+if (!uploadError) {
+ // Update game record with file name
+ const { error: updateError } = await supabase
+   .from('millionaire_games')
+   .update({ file_id: `${game_id}.txt` })
+   .eq('id', game_id)
+}
+    } catch (err) {
+        console.log(err);
+
+    }
+
+}
+
+const insertWwbmQuestion = async (
+    gameId: string,
+    question: string,
+): Promise<string | null> => {
     const supabase = getSupabase();
     try {
         const { data, error } = await supabase.from("millionaire_questions")
-            .insert({ 'game_id': gameId, 'question': question}).select().single();
+            .insert({ "game_id": gameId, "question": question }).select()
+            .single();
         if (error) throw error;
         return data["id"];
     } catch (error) {
@@ -65,12 +105,19 @@ const insertWwbmQuestion = async (gameId: string, question: string): Promise<str
     }
 };
 
-
-const insertWwbmMc = async (questionId: string, content: string, correct: boolean): Promise<string | null> => {
+const insertWwbmMc = async (
+    questionId: string,
+    content: string,
+    correct: boolean,
+): Promise<string | null> => {
     const supabase = getSupabase();
     try {
-        const { data, error } = await supabase.from('millionaire_mc_options')
-            .insert({'clue': content, 'question_id': questionId, 'correct': correct}).select().single();
+        const { data, error } = await supabase.from("millionaire_mc_options")
+            .insert({
+                "clue": content,
+                "question_id": questionId,
+                "correct": correct,
+            }).select().single();
         if (error) throw error;
         return data["id"];
     } catch (error) {
@@ -79,54 +126,103 @@ const insertWwbmMc = async (questionId: string, content: string, correct: boolea
     }
 };
 
+const getWwbmGames = async (id: string) => {
+    const supabase = getSupabase();
 
-const getWwbmGames = async(id: string) =>{
-    const supabase = getSupabase()
+    try {
+        const { data, error } = await supabase.from("millionaire_games").select(
+            "*",
+        ).eq("id", id).single();
+        if (error) throw error;
 
-    try{
-        const {data, error} = await supabase.from('millionaire_games').select('*').eq('id', id).single()
-        if(error) throw error
-
-        return data
-    } catch(error){
-        console.log(error)
+        return data;
+    } catch (error) {
+        console.log(error);
+        return null;
     }
-}
-const getWwbmQuestions = async(id: string) => {
+};
+
+const getGameText = async (game_id: string) => {
     const supabase = getSupabase()
+    try {
+        const game = await getWwbmGames(game_id);
 
-    try{
-        const {data, error} = await supabase.from('millionaire_questions').select().eq('game_id', id)
-        console.log(`question data: ${data}`)
-        if (error) throw error
-
-        const questions = []
-        for (let i = 0; i < data.length; i++){
-            const mcData = await supabase.from('millionaire_mc_options').select('*').eq('question_id', data[i].id)
-            console.log(`${mcData}`)
-
-            questions.push({'options': mcData.data, 'question': data[i]})
-
+        if (game == null) {
+            return null;
         }
 
-        return {'questions': questions}
-    } catch(error){
-        console.log(error)
+        const file_id = game.file_id;
+
+        if(file_id == null){
+            return null
+        }
+
+        const { data, error } = await supabase
+            .storage
+            .from('files')
+            .download(file_id);
+
+        if (data) {
+            const text = await data.text();
+        }
+
+        return data
+    } catch (err) {
+        console.log(err)
     }
-}
+};
+const getWwbmQuestions = async (id: string) => {
+    const supabase = getSupabase();
 
-const getAllWwbmGames = async () =>{
-    const supabase = getSupabase()
+    try {
+        const { data, error } = await supabase.from("millionaire_questions")
+            .select().eq("game_id", id);
+        console.log(`question data: ${data}`);
+        if (error) throw error;
 
-    try{
-        const {data, error} = await supabase.from('millionaire_games').select('*')
-        if(error) throw error
-        return data as WwbmGame[]
-    } catch(error){
-        console.log(error)
+        const questions = [];
+        for (let i = 0; i < data.length; i++) {
+            const mcData = await supabase.from("millionaire_mc_options").select(
+                "*",
+            ).eq("question_id", data[i].id);
+            console.log(`${mcData}`);
+
+            questions.push({ "options": mcData.data, "question": data[i] });
+        }
+
+        return { "questions": questions };
+    } catch (error) {
+        console.log(error);
     }
-}
+};
 
+const getAllWwbmGames = async () => {
+    const supabase = getSupabase();
+
+    try {
+        const { data, error } = await supabase.from("millionaire_games").select(
+            "*",
+        );
+        if (error) throw error;
+        return data as WwbmGame[];
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+const getUserWwbmGames = async (user_id: string) => {
+    const supabase = getSupabase();
+
+    try {
+        const { data, error } = await supabase.from("millionaire_games").select(
+            "*",
+        ).eq("user_id", user_id);
+        if (error) throw error;
+        return data as WwbmGame[];
+    } catch (error) {
+        console.log(error);
+    }
+};
 
 const getWwbmGame = async (id: string) => {
     const supabase = getSupabase();
@@ -145,10 +241,7 @@ const getWwbmGame = async (id: string) => {
         console.error(err);
         return null;
     }
-}
-
-
-
+};
 
 const updateWwbmHighScore = async (score: number, id: string) => {
     const supabase = getSupabase();
@@ -185,6 +278,73 @@ const updateWwbmHighScore = async (score: number, id: string) => {
     }
 };
 
+const getExperience = async (
+    score: number,
+    user_id: string,
+): Promise<number> => {
+    const supabase = getSupabase();
+    try {
+        const { data, error } = await supabase
+            .from("user_accounts")
+            .select("*")
+            .eq("id", user_id)
+            .select()
+            .single();
 
+        if (error || data == null) {
+            console.log("Get xp error");
+            throw error;
+        }
 
-export {insertWwbmGame, insertWwbmMatch, insertWwbmMc, insertWwbmQuestion, getWwbmGames, getWwbmQuestions, getAllWwbmGames, updateWwbmHighScore}
+        const xp = data.xp;
+
+        if (xp == null) {
+            return 0;
+        }
+        return xp;
+    } catch (err) {
+        console.log(err);
+        return 0;
+    }
+};
+
+const addExperience = async (score: number, user_id: string) => {
+    const supabase = getSupabase();
+    try {
+        let newXp = await getExperience(score, user_id);
+
+        newXp += score;
+
+        const { data, error } = await supabase
+            .from("user_accounts")
+            .update({ xp: newXp })
+            .eq("id", user_id)
+            .select()
+            .single();
+
+        if (error) {
+            throw error;
+        }
+
+        return data;
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
+};
+
+export {
+    addExperience,
+    getAllWwbmGames,
+    getExperience,
+    getUserWwbmGames,
+    getWwbmGames,
+    getWwbmQuestions,
+    insertWwbmGame,
+    insertWwbmMatch,
+    insertWwbmMc,
+    insertWwbmQuestion,
+    updateWwbmHighScore,
+    getGameText,
+    insertGameText
+};

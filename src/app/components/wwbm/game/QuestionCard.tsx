@@ -57,9 +57,9 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ points, question, handleAns
             <div className="absolute inset-0 bg-gradient-to-tr from-blue-300/20 via-transparent to-orange-300/20"></div>
             <div className="relative z-10 ">
                 <div className='flex justify-center'>
-                    <div className="w-fit bg-white px-6 py-2 mx-4 rounded-full mb-2 text-center border-2 border-blue-100">
+                    {/* <div className="w-fit bg-white px-6 py-2 mx-4 rounded-full mb-2 text-center border-2 border-blue-100">
                         <span className="text-black text-lg font-semibold">{points} pt</span>
-                    </div>
+                    </div> */}
                 </div>
 
                 <h2 className="text-xl font-semibold text-center mb-4">{question.question.question}</h2>

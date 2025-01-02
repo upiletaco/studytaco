@@ -4,6 +4,8 @@ import posthog from 'posthog-js';
 import { WwbmGame } from '@/app/util/wwbm.types';
 import { Clock, Play, Star, Users } from 'lucide-react';
 import LoadingPage from '../LoadingPage';
+import { getSupabase } from '@/app/services/supabaseClient';
+import { User } from '@supabase/supabase-js';
 
 // interface BoardData {
 //   alias: string | null;
@@ -13,15 +15,36 @@ import LoadingPage from '../LoadingPage';
 //   is_public: boolean;
 // }
 
-const DiscoverGames = () => {
+const UserGames = () => {
   const [games, setGames] = useState<WwbmGame[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+
+
   const router = useRouter();
 
   useEffect(() => {
     const fetchBoards = async () => {
+
       try {
-        const response = await fetch('/api/wwbm/getAllGames');
+        const supabase = getSupabase()
+        const { data: { user } } = await supabase.auth.getUser();
+
+        const user_id = user?.id
+
+        if (user_id == null) {
+          return
+        }
+
+        const response = await fetch('/api/wwbm/getUserGames', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            user_id: user_id
+          })
+        });
         const data = await response.json();
         setGames(data.data.reverse());
       } catch (error) {
@@ -45,9 +68,9 @@ const DiscoverGames = () => {
   }
 
   return (
-  <div className="p-4">
+    <div className="p-4">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Discover Games</h2>
+        <h2 className="text-2xl font-bold">Your Games</h2>
         <select className="bg-white border rounded-lg px-3 py-2 text-sm">
           <option>All Categories</option>
           <option>History</option>
@@ -92,4 +115,4 @@ const DiscoverGames = () => {
   )
 };
 
-export default DiscoverGames;
+export default UserGames;

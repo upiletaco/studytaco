@@ -24,7 +24,7 @@ const GamePage = () => {
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
               Welcome to{' '}
               <span className="bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">
-                Taco Learn
+                Study Taco
               </span>
             </h1>
             <p className="text-xl text-gray-600 max-w-xl">
@@ -42,8 +42,8 @@ const GamePage = () => {
                 <div className="text-sm text-gray-600">Games Created</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">98%</div>
-                <div className="text-sm text-gray-600">Satisfaction</div>
+                <div className="text-2xl font-bold text-gray-900">20%+</div>
+                <div className="text-sm text-gray-600">Grade Boost</div>
               </div>
             </div>
           </div>
