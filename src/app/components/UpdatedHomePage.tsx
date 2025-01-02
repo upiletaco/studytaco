@@ -3,6 +3,8 @@ import { Brain, Play, Trophy, Users } from 'lucide-react';
 import { GeometricTaco } from './survey/illustrations/Taco';
 import { useRouter } from 'next/navigation';
 import HeaderBar from './HeaderBar';
+import Navbar from './Navbar';
+import Image from 'next/image';
 
 const GamePage = () => {
   const router = useRouter()
@@ -15,19 +17,20 @@ const GamePage = () => {
   };
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-      <HeaderBar />
+      <Navbar />
       {/* Hero Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-12">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-12">
           {/* Left side content */}
-          <div className="flex-1 space-y-6">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
+          <div className="flex-1 space-y-6 text-center">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 flex items-center justify-center gap-2">
               Welcome to{' '}
               <span className="bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">
                 Study Taco
               </span>
+              <Image src="/taco-design.png" alt="Taco" width={96} height={96} />
             </h1>
-            <p className="text-xl text-gray-600 max-w-xl">
+            <p className="text-xl text-gray-600 flex items-center justify-center ">
               Transform your study materials into engaging quiz games. Learn faster, remember longer.
             </p>
 
@@ -49,10 +52,10 @@ const GamePage = () => {
           </div>
 
           {/* Right side mascot */}
-          <div className="w-48 h-48 md:w-64 md:h-64 relative flex items-center justify-center">
+          {/* <div className="w-48 h-48 md:w-64 md:h-64 relative flex items-center justify-center">
             <div className=" mb-4 absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-emerald-500/20 rounded-full animate-pulse flex justify-center align-middle items-center" />
             <GeometricTaco />
-          </div>
+          </div> */}
         </div>
       </div>
 
