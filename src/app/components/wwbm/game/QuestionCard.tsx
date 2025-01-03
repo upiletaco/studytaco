@@ -6,10 +6,11 @@ interface QuestionCardProps {
 
     points: string;
     question: QuestionData;
-    handleAnswerSelect: (optionId: string) => void
+    handleAnswerSelect: (optionId: string) => void;
+    lives: number;
 }
 
-const QuestionCard: React.FC<QuestionCardProps> = ({ question, handleAnswerSelect }) => {
+const QuestionCard: React.FC<QuestionCardProps> = ({ question, handleAnswerSelect, lives }) => {
     const [shuffledOptions, setShuffledOptions] = useState<Option[]>([])
     const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -51,9 +52,33 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, handleAnswerSelec
 
         return baseStyles + " border-blue-100"; // Default border
     };
+    const getCardBorderClass = () => {
+        const baseClasses = "rounded-[48px] p-6 bg-gradient-to-tr from-blue-50 via-white to-orange-50 overflow-hidden relative m-4";
+        
+        if (lives === 2) {
+            // Light red, slow pulse
+            return `${baseClasses} before:absolute before:inset-0 before:rounded-[48px] before:border-red-200 before:transition-all before:duration-2000 before:animate-[border-pulse-slow_2s_ease-in-out_infinite]`;
+        } else if (lives === 1) {
+            // Deep red, fast pulse
+            return `${baseClasses} before:absolute before:inset-0 before:rounded-[48px] before:border-red-400 before:transition-all before:duration-1000 before:animate-[border-pulse-fast_1s_ease-in-out_infinite]`;
+        }
+        
+        return baseClasses;
+    };
 
     return (
-        <Card className="rounded-[48px]  p-6 bg-gradient-to-tr from-blue-50 via-white to-orange-50 overflow-hidden relative m-4">
+        
+        <Card className={getCardBorderClass()}>
+             <style jsx>{`
+                @keyframes border-pulse-slow {
+                    0%, 100% { border-width: 2px; }
+                    50% { border-width: 4px; }
+                }
+                @keyframes border-pulse-fast {
+                    0%, 100% { border-width: 2px; }
+                    50% { border-width: 6px; }
+                }
+            `}</style>
             <div className="absolute inset-0 bg-gradient-to-tr from-blue-300/20 via-transparent to-orange-300/20"></div>
             <div className="relative z-10 ">
                 <div className='flex justify-center'>

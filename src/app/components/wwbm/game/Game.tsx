@@ -251,7 +251,7 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
                 <MillionaireTitleBar title={title} currentQuestionIndex={currentQuestionIndex} questionLength={questions.length} score={score} handlePrizes={() => { }} streak={streak} />
 
                 <LivesDisplay lives={lives} />
-                {loadingMoreQuestions == false && <QuestionCard points={prizeLadder[currentQuestionIndex]} question={currentQuestion} handleAnswerSelect={handleAnswerSelect} />
+                {loadingMoreQuestions == false && <QuestionCard points={prizeLadder[currentQuestionIndex]} question={currentQuestion} handleAnswerSelect={handleAnswerSelect} lives={lives} />
                 }
                 {loadingMoreQuestions == true && <LoadingQuestionCard/>}
                 <GameLifelineButtons handleLifeline={handleLifeline} usedLifelines={usedLifelines} />
