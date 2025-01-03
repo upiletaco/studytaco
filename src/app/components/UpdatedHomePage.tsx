@@ -1,5 +1,5 @@
 import React from 'react';
-import { Brain, Play, Trophy, Users } from 'lucide-react';
+import { Brain, Mail, Play, Trophy, Users } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Navbar from './Navbar';
 import Image from 'next/image';
@@ -134,6 +134,34 @@ const GamePage = () => {
           </div>
         </div>
       </div>
+      <footer className="bg-white border-t border-gray-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex flex-col md:flex-row justify-between items-center">
+          {/* Brand and Copyright */}
+          <div className="mb-8 md:mb-0 text-center md:text-left">
+            <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">
+                StudyTaco
+              </span>
+              <Image src="/taco-design.png" alt="Taco" width={24} height={24} />
+            </div>
+            <p className="text-sm text-gray-500">
+              © {new Date().getFullYear()} StudyTaco. All rights reserved.
+            </p>
+          </div>
+
+          {/* Support */}
+          <div className="flex flex-col items-center md:items-end">
+            <div className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors">
+              <Mail className="w-4 h-4" />
+              <a href="mailto:support@studytaco.com" className="text-sm">
+                support@studytaco.com
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
     </div>
   );
 };
