@@ -7,6 +7,7 @@ import HeaderBar from "../HeaderBar";
 import DiscoverGames from "./DiscoverGames";
 import MillionaireUpload from "./MillionaireUpload";
 import UserGames from "./YourGames";
+import Navbar from "../Navbar";
 
 const WwbmHomePage: React.FC<WwbmHomeScreenProps> = ({ onQuestionsGenerated }) => {
     const [files, setFiles] = useState<UploadedFile[]>([]);
@@ -85,10 +86,11 @@ const WwbmHomePage: React.FC<WwbmHomeScreenProps> = ({ onQuestionsGenerated }) =
 
     return (
         <div className="min-h-screen bg-white flex items-center justify-center relative w-full">
-            <HeaderBar instructions="millionaire" />
 
-            <div className="max-w-4xl w-full p-8">
+            <div className="max-w-7xl w-full p-8">
                 <div className="flex flex-col items-center">
+
+                    <Navbar instructions="millionaire" />
 
 
                     <MillionaireUpload onFileUpload={handleFileUpload} onTranscriptFound={handleTranscriptFound} />
@@ -110,7 +112,7 @@ const WwbmHomePage: React.FC<WwbmHomeScreenProps> = ({ onQuestionsGenerated }) =
                     )}
                 </div>
 
-                <UserGames/>
+                <UserGames />
 
                 <DiscoverGames />
 
