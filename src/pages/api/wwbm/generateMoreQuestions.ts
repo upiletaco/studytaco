@@ -1,25 +1,26 @@
 // pages/api/generate.ts
 import { NextApiRequest, NextApiResponse } from "next";
 import Groq from "groq-sdk";
-import { getGameText, insertWwbmMc, insertWwbmQuestion } from "@/app/services/wwbmService";
+import {
+    getGameText,
+    getWwbmQuestions,
+    insertWwbmMc,
+    insertWwbmQuestion,
+} from "@/app/services/wwbmService";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
 
 interface Question {
     question: string;
     content: string[];
     correct: string;
-  }
-  
-  interface QuizData {
-    questions: Question[];
-  }
-  interface APIResponse {
-    questions: QuizData;  // Now directly contains the parsed questions
-   
 }
-  
+
+interface QuizData {
+    questions: Question[];
+}
+interface APIResponse {
+}
 
 export const maxDuration = 180;
 if (!groq) {
@@ -38,7 +39,7 @@ export const config = {
 
 export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse<APIResponse | { error: string; details?: string }>
+    res: NextApiResponse<APIResponse | { error: string; details?: string }>,
 ) {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "POST");
@@ -49,9 +50,9 @@ export default async function handler(
     }
 
     try {
-        const {  questions, game_id } = req.body;
+        const { questions, game_id } = req.body;
 
-        const text = await getGameText(game_id)
+        const text = await getGameText(game_id);
 
         const prompt = `
 You are a quiz question generator. Using the provided text and questions, generate 10 unique multiple choice quiz questions that progressively get harder like the game Who wants to be a millionare. Questions have already been made previously.
@@ -128,31 +129,37 @@ Provided Qestions: ${questions}
                 throw new Error("No questions generated");
             }
 
-
             const parsedQuestions = JSON.parse(generatedQuestions) as QuizData;
 
-
-             for (let i = 0; i < parsedQuestions.questions.length; i++) {
-                        const question: Question = parsedQuestions.questions[i];
-                        const question_id = await insertWwbmQuestion(
-                            game_id,
-                            question.question,
-                        );
-                        console.log(`Category saved at ${question_id}`);
-                        if (question_id == null) return null;
-                        for (let j = 0; j < question.content.length; j++) {
-                            let correct = false;
-                            if (question.content[j] == question.correct) {
-                                correct = true;
-                            }
-                            await insertWwbmMc(question_id, question.content[j], correct);
-                        }
+            for (let i = 0; i < parsedQuestions.questions.length; i++) {
+                const question: Question = parsedQuestions.questions[i];
+                const question_id = await insertWwbmQuestion(
+                    game_id,
+                    question.question,
+                );
+                console.log(`Category saved at ${question_id}`);
+                if (question_id == null) return null;
+                for (let j = 0; j < question.content.length; j++) {
+                    let correct = false;
+                    if (question.content[j] == question.correct) {
+                        correct = true;
                     }
-           
+                    await insertWwbmMc(
+                        question_id,
+                        question.content[j],
+                        correct,
+                    );
+                }
+            }
 
+            const game = await getWwbmQuestions(game_id)
+
+            console.log("New game: ")
+            console.log(game)
+
+          
             return res.status(200).json({
-                questions: parsedQuestions,
-                
+                questions: game,
             });
         } catch (error: unknown) {
             console.error("OpenAI API error:", error);
@@ -168,5 +175,3 @@ Provided Qestions: ${questions}
         return res.status(500).json({ error: "Failed to generate questions" });
     }
 }
-
-

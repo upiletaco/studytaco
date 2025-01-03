@@ -13,15 +13,18 @@ import LivesDisplay from './LivesDisplay';
 import { StreakPopup } from './StreakPopup';
 import { addExperience } from '@/app/services/wwbmService';
 import { getSupabase } from '@/app/services/supabaseClient';
+import LoadingQuestionCard from './LoadingQuestionCard';
 
 export interface PlayWwbmProps {
     title: string,
     questions: QuestionData[]
     link: string;
+    onNeedMoreQuestions: () => Promise<boolean>;
+
 
 }
 
-const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }) => {
+const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link, onNeedMoreQuestions }) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
@@ -41,6 +44,7 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
     const [lives, setLives] = useState(5);
     const [streak, setStreak] = useState(0);
     const [showStreakPopup, setShowStreakPopup] = useState(false);
+    const [loadingMoreQuestions, setLoadingMoreQuestions] = useState<boolean>(false)
 
     useEffect(() => {
         console.log(questions)
@@ -138,6 +142,7 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
 
 
             if (currentQuestionIndex === questions.length - 1) {
+                setLoadingMoreQuestions(true)
                 const gameId = getGameId(link);
 
                 const simplified = questions.map(q => ({ question: q.question.question, options: q.options.map(o => ({ clue: o.clue, correct: o.correct })) }));
@@ -152,12 +157,28 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
                     })
                 });
 
+
+
+
+
                 if (response.ok) {
+
+                    // await new Promise(resolve => setTimeout(resolve, 1000));
+                    // const success = await onNeedMoreQuestions();
+                    // if (success) {
+                    //     console.log("Success!")
+                    //     setCurrentQuestionIndex(prev => prev + 1);
+                    // }
                     const { questions: newQuestions } = await response.json();
-                    setQuestions([...questions, newQuestions]);
+                    // // setQuestions([...questions, ...newQuestions.questions.flat()]);
+                    console.log(`newquestions:`)
+                    console.log(newQuestions)
+                    setQuestions(newQuestions.questions);
+
                     setCurrentQuestionIndex(prev => prev + 1);
 
                 }
+                setLoadingMoreQuestions(false)
             } else {
                 setTimeout(() => {
                     console.log("CORRECT!")
@@ -229,11 +250,12 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
                 {/* <StreakCounter streak={streak} /> */}
 
                 <MillionaireTitleBar title={title} currentQuestionIndex={currentQuestionIndex} questionLength={questions.length} score={score} handlePrizes={() => { }} streak={streak} />
+
                 <LivesDisplay lives={lives} />
-
-                <QuestionCard points={prizeLadder[currentQuestionIndex]} question={currentQuestion} handleAnswerSelect={handleAnswerSelect} />
+                {loadingMoreQuestions == false && <QuestionCard points={prizeLadder[currentQuestionIndex]} question={currentQuestion} handleAnswerSelect={handleAnswerSelect} />
+                }
+                {loadingMoreQuestions == true && <LoadingQuestionCard/>}
                 <GameLifelineButtons handleLifeline={handleLifeline} usedLifelines={usedLifelines} />
-
 
                 <StreakPopup streak={streak} show={showStreakPopup} />
                 {showLifelineModal && <FiftyFiftyModal questions={questions} currentQuestionIndex={currentQuestionIndex} lifelineOptions={lifelineOptions} letterMapping={letterMapping} handleLifelineAnswer={handleLifelineAnswer} />}

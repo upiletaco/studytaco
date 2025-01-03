@@ -41,9 +41,36 @@ const PlayWwbm = () => {
     const [error, setError] = useState<string | null>(null);
     const [gameTitle, setGameTitle] = useState<string>("")
     const [link, setLink] = useState<string | null>(null)
-    const [highScore, setHighScore] = useState<number|null>(null)
+    const [highScore, setHighScore] = useState<number | null>(null)
     const [isPublic, setIsPublic] = useState<boolean>(false)
 
+
+    const refetchGameData = async () => {
+        console.log("Fetching the new game")
+        try {
+            const response = await fetch('/api/wwbm/getGame', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    "game_id": id,
+                }),
+            });
+            if (!response.ok) {
+                throw new Error('Failed to retrieve game');
+            }
+            const { data, questions } = await response.json();
+            console.log("the updated questions: ")
+            console.log(questions.questions)
+            setGameData(questions.questions);
+            // Update other state if needed
+            return true;
+        } catch (err) {
+            console.error('Error refetching game data:', err);
+            return false;
+        }
+    };
 
     useEffect(() => {
         setLink(`${window.location.origin}${router.asPath}`)
@@ -76,12 +103,12 @@ const PlayWwbm = () => {
                 setIsPublic(data.is_public)
                 const url = `${window.location.origin}/millionaire/play/${data.alias.replaceAll(" ", "-")}/${id}`;
                 const fullUrl = `${window.location.origin}${router.asPath}`
-                if(fullUrl != null){
+                if (fullUrl != null) {
                     setLink(fullUrl)
                 } else {
                     setLink(url)
                 }
-                
+
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to load game data');
                 console.error('Error fetching game data:', err);
@@ -99,7 +126,7 @@ const PlayWwbm = () => {
         //     } else {
         //         setLink(url)
         //     }
-            
+
         // }
         if (id) {
             fetchGameData();
@@ -110,7 +137,7 @@ const PlayWwbm = () => {
 
     if (isLoading) {
         return (
-            <LoadingPage/>
+            <LoadingPage />
         );
     }
 
@@ -141,7 +168,8 @@ const PlayWwbm = () => {
             </div>
         );
     }
-    return <Game title={gameTitle} questions={gameData} link={link!}/>
+    return <Game title={gameTitle} questions={gameData} link={link!} onNeedMoreQuestions={refetchGameData}
+    />
 
 }
 

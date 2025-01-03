@@ -55,7 +55,7 @@ export default async function handler(
         }
 
         const prompt = `
-You are a quiz question generator. Using the provided text, generate 15 unique multiple choice quiz questions that progressively get harder like the game Who wants to be a millionare.
+You are a quiz question generator. Using the provided text, generate 3 unique multiple choice quiz questions that progressively get harder like the game Who wants to be a millionare.
 Format your response as a valid JSON array with the following structure. Do not include any additional text or explanations in your response:
 [
   
@@ -101,8 +101,8 @@ Format your response as a valid JSON array with the following structure. Do not 
 ]
 
 Requirements:
-- Each of the 15 questions should be unique and based on the provided text
-- Make sure the 15 questions are related to the text
+- Each of the 3 questions should be unique and based on the provided text
+- Make sure the 3 questions are related to the text
 - Difficulty should increase through each question
 - Multiple choice options should be related to the text
 - All questions must be factual and derived from the provided text
