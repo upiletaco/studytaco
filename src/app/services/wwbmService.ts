@@ -17,8 +17,7 @@ const insertWwbmMatch = async (
             return null;
         }
 
-        insertGameText(game_id, text)
-
+        insertGameText(game_id, text);
 
         console.log(`Game id saved at ${game_id}`);
         for (let i = 0; i < data.length; i++) {
@@ -62,31 +61,33 @@ const insertWwbmGame = async (
     }
 };
 
-
-const insertGameText = async(game_id: string, text: string) => {
-    const supabase = getSupabase()
+const insertGameText = async (game_id: string, text: string) => {
+    const supabase = getSupabase();
 
     try {
-        const { data: uploadData, error: uploadError } = await supabase
- .storage
- .from('files')
- .upload(`${game_id}.txt`, text, {
-   contentType: 'text/plain'
- })
+        const {error: uploadError } = await supabase
+            .storage
+            .from("files")
+            .upload(`${game_id}.txt`, text, {
+                contentType: "text/plain",
+            });
 
-if (!uploadError) {
- // Update game record with file name
- const { error: updateError } = await supabase
-   .from('millionaire_games')
-   .update({ file_id: `${game_id}.txt` })
-   .eq('id', game_id)
-}
+        if (!uploadError) {
+            // Update game record with file name
+            const { error: updateError } = await supabase
+                .from("millionaire_games")
+                .update({ file_id: `${game_id}.txt` })
+                .eq("id", game_id);
+
+
+                if (updateError) throw updateError
+        }
+
+
     } catch (err) {
         console.log(err);
-
     }
-
-}
+};
 
 const insertWwbmQuestion = async (
     gameId: string,
@@ -143,7 +144,7 @@ const getWwbmGames = async (id: string) => {
 };
 
 const getGameText = async (game_id: string) => {
-    const supabase = getSupabase()
+    const supabase = getSupabase();
     try {
         const game = await getWwbmGames(game_id);
 
@@ -153,22 +154,26 @@ const getGameText = async (game_id: string) => {
 
         const file_id = game.file_id;
 
-        if(file_id == null){
-            return null
+        if (file_id == null) {
+            return null;
         }
 
         const { data, error } = await supabase
             .storage
-            .from('files')
+            .from("files")
             .download(file_id);
+
+        if(error) throw error
 
         if (data) {
             const text = await data.text();
+            return text
         }
+        
 
-        return data
+        
     } catch (err) {
-        console.log(err)
+        console.log(err);
     }
 };
 const getWwbmQuestions = async (id: string) => {
@@ -337,14 +342,14 @@ export {
     addExperience,
     getAllWwbmGames,
     getExperience,
+    getGameText,
     getUserWwbmGames,
     getWwbmGames,
     getWwbmQuestions,
+    insertGameText,
     insertWwbmGame,
     insertWwbmMatch,
     insertWwbmMc,
     insertWwbmQuestion,
     updateWwbmHighScore,
-    getGameText,
-    insertGameText
 };

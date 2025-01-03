@@ -169,10 +169,4 @@ Provided Qestions: ${questions}
     }
 }
 
-function firstThreeWords(str: string): string {
-    const words = str.trim().split(/\s+/);
-    if (words.length > 3) {
-        return words.slice(0, 3).join(" ");
-    }
-    return str;
-}
+

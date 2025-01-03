@@ -5,7 +5,6 @@ import { WwbmGame } from '@/app/util/wwbm.types';
 import { Clock, Play, Star, Users } from 'lucide-react';
 import LoadingPage from '../LoadingPage';
 import { getSupabase } from '@/app/services/supabaseClient';
-import { User } from '@supabase/supabase-js';
 
 // interface BoardData {
 //   alias: string | null;

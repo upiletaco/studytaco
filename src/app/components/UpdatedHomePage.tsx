@@ -1,8 +1,6 @@
 import React from 'react';
 import { Brain, Play, Trophy, Users } from 'lucide-react';
-import { GeometricTaco } from './survey/illustrations/Taco';
 import { useRouter } from 'next/navigation';
-import HeaderBar from './HeaderBar';
 import Navbar from './Navbar';
 import Image from 'next/image';
 

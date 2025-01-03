@@ -3,7 +3,6 @@ import { UploadedFile, WwbmHomeScreenProps, WwbmQuestion } from "@/app/util/wwbm
 import FileDisplay from "./FileDisplay";
 import GenerateButton from "../GenerateButton";
 import LoadingText from "../loadingText";
-import HeaderBar from "../HeaderBar";
 import DiscoverGames from "./DiscoverGames";
 import MillionaireUpload from "./MillionaireUpload";
 import UserGames from "./YourGames";

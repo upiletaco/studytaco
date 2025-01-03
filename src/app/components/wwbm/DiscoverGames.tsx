@@ -71,14 +71,14 @@ const DiscoverGames = () => {
                 <Users size={16} />
                 <span>100</span>
               </div>
-              <div className="flex items-center gap-1">
+              {/* <div className="flex items-center gap-1">
                 <Clock size={16} />
                 <span>10</span>
-              </div>
-              <div className="flex items-center gap-1">
+              </div> */}
+              {/* <div className="flex items-center gap-1">
                 <Star size={16} className="text-yellow-500 fill-yellow-500" />
                 <span>4.8</span>
-              </div>
+              </div> */}
             </div>
 
             <button onClick={() => handleGameClick(game.id, game.alias)} className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg flex items-center justify-center gap-2 transition-colors">

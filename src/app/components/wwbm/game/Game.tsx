@@ -11,6 +11,8 @@ import FollowUpFriendModal from './FollowUpFriendModal';
 import AudienceModal from './AudienceModal';
 import LivesDisplay from './LivesDisplay';
 import { StreakPopup } from './StreakPopup';
+import { addExperience } from '@/app/services/wwbmService';
+import { getSupabase } from '@/app/services/supabaseClient';
 
 export interface PlayWwbmProps {
     title: string,
@@ -26,7 +28,6 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
     const [gameOver, setGameOver] = useState(false);
     const [score, setScore] = useState(0);
     const [correctAnswers, setCorrectAnswers] = useState(0);
-    const [showPrizeLadder, setShowPrizeLadder] = useState(true);
     const [usedLifelines, setUsedLifelines] = useState<Set<string>>(new Set());
     const [questions, setQuestions] = useState(propQuestions);
     const [currentQuestion, setCurrentQuestion] = useState(questions[currentQuestionIndex]);
@@ -42,6 +43,7 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
     const [showStreakPopup, setShowStreakPopup] = useState(false);
 
     useEffect(() => {
+        console.log(questions)
         setCurrentQuestion(questions[currentQuestionIndex]);
     }, [currentQuestionIndex, questions]);
 
@@ -49,7 +51,7 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
         return link.split('/').pop() || '';
     };
 
-   
+
 
 
     const handleLifeline = (lifeline: string) => {
@@ -135,15 +137,17 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
             setCorrectAnswers(prev => prev + 1);
 
 
-            if (currentQuestionIndex === Math.min(prizeLadder.length - 1, questions.length - 1)) {
+            if (currentQuestionIndex === questions.length - 1) {
                 const gameId = getGameId(link);
+
+                const simplified = questions.map(q => ({ question: q.question.question, options: q.options.map(o => ({ clue: o.clue, correct: o.correct })) }));
                 const response = await fetch('/api/wwbm/generateMoreQuestions', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        questions: JSON.stringify(questions),
+                        questions: JSON.stringify(simplified),
                         game_id: gameId
                     })
                 });
@@ -178,14 +182,21 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
     };
 
     const handleGameOver = async () => {
+        const supabase = getSupabase()
+        const { data: { user } } = await supabase.auth.getUser();
+
+        const user_id = user?.id
+
+        if (user_id == null) {
+            return
+        }
+        console.log(`Adding xp for ${user_id}`)
+        addExperience(score, user_id)
 
     }
 
 
 
-    const handlePrizeLadder = () => {
-        setShowPrizeLadder(false)
-    }
 
 
     const handlePhoneBack = () => {
@@ -201,7 +212,6 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
         setGameOver(false);
         setSelectedAnswerId(null);
         setIsCorrect(null);
-        setShowPrizeLadder(false);
         setUsedLifelines(new Set())
         setLives(5)
     };
@@ -218,7 +228,7 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
             <div className='w-full max-w-[600px]  text-black flex flex-col'>
                 {/* <StreakCounter streak={streak} /> */}
 
-                <MillionaireTitleBar title={title} currentQuestionIndex={currentQuestionIndex} questionLength={questions.length} score={score} handlePrizes={() => setShowPrizeLadder(true)} streak={streak} />
+                <MillionaireTitleBar title={title} currentQuestionIndex={currentQuestionIndex} questionLength={questions.length} score={score} handlePrizes={() => { }} streak={streak} />
                 <LivesDisplay lives={lives} />
 
                 <QuestionCard points={prizeLadder[currentQuestionIndex]} question={currentQuestion} handleAnswerSelect={handleAnswerSelect} />
