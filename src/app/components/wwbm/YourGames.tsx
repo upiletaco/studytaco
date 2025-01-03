@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import posthog from 'posthog-js';
 import { WwbmGame } from '@/app/util/wwbm.types';
-import { Clock, Play, Star, Users } from 'lucide-react';
+import { Play, Star, Users } from 'lucide-react';
 import LoadingPage from '../LoadingPage';
 import { getSupabase } from '@/app/services/supabaseClient';
 
