@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import posthog from 'posthog-js';
 import { WwbmGame } from '@/app/util/wwbm.types';
-import {  Play, Users } from 'lucide-react';
+import { Clock, Play, Star, Users } from 'lucide-react';
 import LoadingPage from '../LoadingPage';
 
 // interface BoardData {
@@ -44,6 +44,37 @@ const DiscoverGames = () => {
     return <LoadingPage />
   }
 
+  // return (
+  //   <div className="p-6 max-w-3xl mx-auto ">
+  //     <h1 className=" font-bold mb-8 text-3xl text-black">Discover Games</h1>
+
+  //     <div className="space-y-4">
+  //       {games.map((game, index) => (
+  //         <button
+  //           key={game.id}
+            // onClick={() => handleGameClick(game.id, game.alias)}
+  //           className={`w-full text-left p-6 rounded-xl transition-all hover:scale-[1.02] flex justify-between items-center group
+  //                   ${index % 2 === 0 ? 'bg-blue-100' : 'bg-orange-100'}`}
+  //         >
+  //           <div>
+  //             <h2 className="text-2xl font-semibold text-gray-800">
+  //               {game.alias || 'Untitled Game'}
+  //             </h2>
+  //             {game.high_score && (
+  //               <p className="text-gray-600">
+  //                 High Score: ${game.high_score.toLocaleString()}
+  //               </p>
+  //             )}
+  //           </div>
+  //           <div className="transform transition-transform group-hover:scale-110">
+  //             <Play size={32} className="text-gray-700" />
+  //           </div>
+  //         </button>
+  //       ))}
+  //     </div>
+  //   </div>
+  // );
+
   return (
   <div className="p-4">
       <div className="flex justify-between items-center mb-6">
@@ -58,27 +89,27 @@ const DiscoverGames = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {games.map(game => (
-          <div key={game.id} onClick={() => handleGameClick(game.id, game.alias)} className="bg-gradient-to-tr from-blue-50 via-white to-orange-50 rounded-xl p-4 hover:shadow-lg transition-shadow border border-blue-100">
+          <div key={game.id} className="bg-gradient-to-tr from-blue-50 via-white to-orange-50 rounded-xl p-4 hover:shadow-lg transition-shadow border border-blue-100">
             <div className="flex justify-between items-start mb-3">
               <div>
                 <h3 className="font-semibold text-lg">{game.alias}</h3>
-                <p className="text-sm text-gray-600">by John Doe</p>
+                {/* <p className="text-sm text-gray-600">by John Doe</p> */}
               </div>
+              {/* <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                {game.category}
+              </span> */}
             </div>
 
             <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
               <div className="flex items-center gap-1">
                 <Users size={16} />
-                <span>100</span>
-              </div>
-              {/* <div className="flex items-center gap-1">
-                <Clock size={16} />
-                <span>10</span>
-              </div> */}
-              {/* <div className="flex items-center gap-1">
+                <span>{Math.floor(Math.random() * (200 - 30 + 1) + 30)}</span>
+                </div>
+             
+              <div className="flex items-center gap-1">
                 <Star size={16} className="text-yellow-500 fill-yellow-500" />
-                <span>4.8</span>
-              </div> */}
+                <span>{(Math.random() * (5.0 - 4.0) + 4.0).toFixed(1)}</span>
+                </div>
             </div>
 
             <button onClick={() => handleGameClick(game.id, game.alias)} className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg flex items-center justify-center gap-2 transition-colors">

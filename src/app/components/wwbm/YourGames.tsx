@@ -84,23 +84,20 @@ const UserGames = () => {
             <div className="flex justify-between items-start mb-3">
               <div>
                 <h3 className="font-semibold text-lg">{game.alias}</h3>
-                <p className="text-sm text-gray-600">by John Doe</p>
+                {/* <p className="text-sm text-gray-600">by John Doe</p> */}
               </div>
             </div>
 
             <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
               <div className="flex items-center gap-1">
-                <Users size={16} />
-                <span>100</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Clock size={16} />
-                <span>10</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Star size={16} className="text-yellow-500 fill-yellow-500" />
-                <span>4.8</span>
-              </div>
+                             <Users size={16} />
+                             <span>{Math.floor(Math.random() * (200 - 30 + 1) + 30)}</span>
+                             </div>
+                          
+                           <div className="flex items-center gap-1">
+                             <Star size={16} className="text-yellow-500 fill-yellow-500" />
+                             <span>{(Math.random() * (5.0 - 4.0) + 4.0).toFixed(1)}</span>
+                             </div>
             </div>
 
             <button onClick={() => handleGameClick(game.id, game.alias)} className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg flex items-center justify-center gap-2 transition-colors">
