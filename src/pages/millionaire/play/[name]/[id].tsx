@@ -41,8 +41,9 @@ const PlayWwbm = () => {
     const [error, setError] = useState<string | null>(null);
     const [gameTitle, setGameTitle] = useState<string>("")
     const [link, setLink] = useState<string | null>(null)
-    const [highScore, setHighScore] = useState<number|null>(null)
+    const [highScore, setHighScore] = useState<number | null>(null)
     const [isPublic, setIsPublic] = useState<boolean>(false)
+
 
 
     useEffect(() => {
@@ -76,12 +77,12 @@ const PlayWwbm = () => {
                 setIsPublic(data.is_public)
                 const url = `${window.location.origin}/millionaire/play/${data.alias.replaceAll(" ", "-")}/${id}`;
                 const fullUrl = `${window.location.origin}${router.asPath}`
-                if(fullUrl != null){
+                if (fullUrl != null) {
                     setLink(fullUrl)
                 } else {
                     setLink(url)
                 }
-                
+
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to load game data');
                 console.error('Error fetching game data:', err);
@@ -99,7 +100,7 @@ const PlayWwbm = () => {
         //     } else {
         //         setLink(url)
         //     }
-            
+
         // }
         if (id) {
             fetchGameData();
@@ -110,7 +111,7 @@ const PlayWwbm = () => {
 
     if (isLoading) {
         return (
-            <LoadingPage/>
+            <LoadingPage />
         );
     }
 
@@ -141,7 +142,8 @@ const PlayWwbm = () => {
             </div>
         );
     }
-    return <Game title={gameTitle} questions={gameData} link={link!}/>
+    return <Game title={gameTitle} questions={gameData} link={link!} 
+    />
 
 }
 

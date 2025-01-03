@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { PlayWwbmProps } from '../PlayWwbm'
 import { prizeLadder } from '@/app/util/wwbm.types';
 import CongratsPage from './EndGame';
-import { Option } from '@/pages/millionaire/play/[name]/[id]'
+import { Option, QuestionData } from '@/pages/millionaire/play/[name]/[id]'
 import MillionaireTitleBar from './TitleBar';
 import QuestionCard from './QuestionCard';
 import GameLifelineButtons from './LifelineButtons';
@@ -10,19 +9,29 @@ import FiftyFiftyModal from './FiftyFiftyModal';
 import PhoneModal from './PhoneModal';
 import FollowUpFriendModal from './FollowUpFriendModal';
 import AudienceModal from './AudienceModal';
-import MobilePrizes from './MobilePrizes';
-import DesktopPrizes from './DesktopPrizes';
+import LivesDisplay from './LivesDisplay';
+import { StreakPopup } from './StreakPopup';
+import { addExperience } from '@/app/services/wwbmService';
+import { getSupabase } from '@/app/services/supabaseClient';
+import LoadingQuestionCard from './LoadingQuestionCard';
+
+export interface PlayWwbmProps {
+    title: string,
+    questions: QuestionData[]
+    link: string;
 
 
-const Game: React.FC<PlayWwbmProps> = ({ questions, title, link }) => {
+}
+
+const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
     const [gameOver, setGameOver] = useState(false);
     const [score, setScore] = useState(0);
     const [correctAnswers, setCorrectAnswers] = useState(0);
-    const [showPrizeLadder, setShowPrizeLadder] = useState(true);
     const [usedLifelines, setUsedLifelines] = useState<Set<string>>(new Set());
+    const [questions, setQuestions] = useState(propQuestions);
     const [currentQuestion, setCurrentQuestion] = useState(questions[currentQuestionIndex]);
     const letterMapping = ['A', 'B', 'C', 'D'];
     const [lifelineOptions, setLifelineOptions] = useState<Option[]>([]);
@@ -31,10 +40,19 @@ const Game: React.FC<PlayWwbmProps> = ({ questions, title, link }) => {
     const [friendSuggestion, setFriendSuggestion] = useState<Option | null>(null);
     const [showPhoneFollowUp, setShowPhoneFollowUp] = useState(false);
     const [showAudiencePoll, setShowAudiencePoll] = useState(false);
+    const [lives, setLives] = useState(5);
+    const [streak, setStreak] = useState(0);
+    const [showStreakPopup, setShowStreakPopup] = useState(false);
+    const [loadingMoreQuestions, setLoadingMoreQuestions] = useState<boolean>(false)
 
     useEffect(() => {
+        console.log(questions)
         setCurrentQuestion(questions[currentQuestionIndex]);
     }, [currentQuestionIndex, questions]);
+
+    const getGameId = (link: string) => {
+        return link.split('/').pop() || '';
+    };
 
 
 
@@ -101,7 +119,7 @@ const Game: React.FC<PlayWwbmProps> = ({ questions, title, link }) => {
         handleAnswerSelect(optionId);
     };
 
-    const handleAnswerSelect = (optionId: string) => {
+    const handleAnswerSelect = async (optionId: string) => {
         if (isCorrect !== null || gameOver) return;
         setSelectedAnswerId(optionId);
 
@@ -110,12 +128,56 @@ const Game: React.FC<PlayWwbmProps> = ({ questions, title, link }) => {
         setIsCorrect(isAnswerCorrect);
 
         if (isAnswerCorrect) {
-            const currentPrize = parseInt(prizeLadder[currentQuestionIndex].replace(/\$|\,/g, ''));
+            setStreak(prev => prev + 1);
+            if ((streak + 1) % 5 === 0) {
+                setShowStreakPopup(true);
+                setTimeout(() => setShowStreakPopup(false), 1000);
+            }
+            // const currentPrize = parseInt(prizeLadder[currentQuestionIndex].replace(/\$|\,/g, ''));
+            const currentPrize = 10;
+
             setScore(prev => prev + currentPrize);
             setCorrectAnswers(prev => prev + 1);
 
-            if (currentQuestionIndex === Math.min(prizeLadder.length - 1, questions.length - 1)) {
-                setGameOver(true);
+
+            if (currentQuestionIndex === questions.length - 1) {
+                setLoadingMoreQuestions(true)
+                const gameId = getGameId(link);
+
+                const simplified = questions.map(q => ({ question: q.question.question, options: q.options.map(o => ({ clue: o.clue, correct: o.correct })) }));
+                const response = await fetch('/api/wwbm/generateMoreQuestions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        questions: JSON.stringify(simplified),
+                        game_id: gameId
+                    })
+                });
+
+
+
+
+
+                if (response.ok) {
+
+                    // await new Promise(resolve => setTimeout(resolve, 1000));
+                    // const success = await onNeedMoreQuestions();
+                    // if (success) {
+                    //     console.log("Success!")
+                    //     setCurrentQuestionIndex(prev => prev + 1);
+                    // }
+                    const { questions: newQuestions } = await response.json();
+                    // // setQuestions([...questions, ...newQuestions.questions.flat()]);
+                    console.log(`newquestions:`)
+                    console.log(newQuestions)
+                    setQuestions(newQuestions.questions);
+
+                    setCurrentQuestionIndex(prev => prev + 1);
+
+                }
+                setLoadingMoreQuestions(false)
             } else {
                 setTimeout(() => {
                     console.log("CORRECT!")
@@ -125,18 +187,36 @@ const Game: React.FC<PlayWwbmProps> = ({ questions, title, link }) => {
                 }, 100);
             }
         } else {
+            setStreak(0);
+            setLives(prev => prev - 1);
             setTimeout(() => {
-                setGameOver(true);
-
-            }, 100)
+                if (lives <= 1) {
+                    setGameOver(true);
+                    handleGameOver()
+                } else {
+                    setSelectedAnswerId(null);
+                    setIsCorrect(null);
+                }
+            }, 100);
         }
     };
 
+    const handleGameOver = async () => {
+        const supabase = getSupabase()
+        const { data: { user } } = await supabase.auth.getUser();
 
+        const user_id = user?.id
 
-    const handlePrizeLadder = () => {
-        setShowPrizeLadder(false)
+        if (user_id == null) {
+            return
+        }
+        console.log(`Adding xp for ${user_id}`)
+        addExperience(score, user_id)
+
     }
+
+
+
 
 
     const handlePhoneBack = () => {
@@ -152,8 +232,8 @@ const Game: React.FC<PlayWwbmProps> = ({ questions, title, link }) => {
         setGameOver(false);
         setSelectedAnswerId(null);
         setIsCorrect(null);
-        setShowPrizeLadder(false);
         setUsedLifelines(new Set())
+        setLives(5)
     };
 
 
@@ -162,19 +242,21 @@ const Game: React.FC<PlayWwbmProps> = ({ questions, title, link }) => {
     )
     return (
         <div className="min-h-screen bg-gray-50 flex justify-center">
-            <DesktopPrizes currentQuestionIndex={currentQuestionIndex} />
+            {/* <DesktopPrizes currentQuestionIndex={currentQuestionIndex} /> */}
 
 
             <div className='w-full max-w-[600px]  text-black flex flex-col'>
+                {/* <StreakCounter streak={streak} /> */}
 
-                <MillionaireTitleBar title={title} currentQuestionIndex={currentQuestionIndex} questionLength={questions.length} score={score} handlePrizes={() => setShowPrizeLadder(true)} />
-                <QuestionCard points={prizeLadder[currentQuestionIndex]} question={currentQuestion} handleAnswerSelect={handleAnswerSelect} />
+                <MillionaireTitleBar title={title} currentQuestionIndex={currentQuestionIndex} questionLength={questions.length} score={score} handlePrizes={() => { }} streak={streak} />
+
+                <LivesDisplay lives={lives} />
+                {loadingMoreQuestions == false && <QuestionCard points={prizeLadder[currentQuestionIndex]} question={currentQuestion} handleAnswerSelect={handleAnswerSelect} />
+                }
+                {loadingMoreQuestions == true && <LoadingQuestionCard/>}
                 <GameLifelineButtons handleLifeline={handleLifeline} usedLifelines={usedLifelines} />
 
-                {showPrizeLadder && (
-                    <MobilePrizes handlePrizeLadder={handlePrizeLadder} currentQuestionIndex={currentQuestionIndex} />
-                )}
-
+                <StreakPopup streak={streak} show={showStreakPopup} />
                 {showLifelineModal && <FiftyFiftyModal questions={questions} currentQuestionIndex={currentQuestionIndex} lifelineOptions={lifelineOptions} letterMapping={letterMapping} handleLifelineAnswer={handleLifelineAnswer} />}
                 {showPhoneFriendModal && (
                     <PhoneModal questions={questions} currentQuestionIndex={currentQuestionIndex} friendSuggestion={friendSuggestion} handleTrue={

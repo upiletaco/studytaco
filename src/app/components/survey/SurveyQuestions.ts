@@ -8,7 +8,7 @@ import { GeometricTaco } from "./illustrations/Taco";
 export const SurveyQuestions = [
   {
     id: 1,
-    question: "What’s your main goal for using Taco Learn?",
+    question: "What’s your main goal for using Study Taco?",
     options: [
       "Improve test scores",
       "Build consistent study habits",

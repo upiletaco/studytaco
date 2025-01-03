@@ -43,6 +43,7 @@ export default function UserMenu() {
 
     async function getUserData() {
         const { data: { user } } = await supabase.auth.getUser();
+        console.log(`User: ${user?.id}`)
         setUser(user);
     }
 

@@ -68,7 +68,7 @@ const handleSignIn = async () => {
         <GeometricTaco />
         
         <h1 className="text-3xl font-serif text-center mb-12 text-black">
-          Welcome to Taco Learn!
+          Welcome to Study Taco!
         </h1>
         
         <div className="space-y-4">

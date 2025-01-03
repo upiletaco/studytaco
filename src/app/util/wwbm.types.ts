@@ -20,7 +20,7 @@ export interface FileDisplayProps {
 }
 
 export interface WwbmHomeScreenProps {
-    onQuestionsGenerated: (questions: WwbmQuestion[], title: string) => void;
+    onQuestionsGenerated: (questions: WwbmQuestion[], title: string, extractedText: string) => void;
 }
 export interface LoadingTextProps {
     isVisible: boolean;
@@ -45,6 +45,7 @@ export interface WwbmQuestion {
 export interface EditScreenProps {
     wwbmQuestions: WwbmQuestion[];
     title: string;
+    text: string;
   }
   
   // Validation errors interface

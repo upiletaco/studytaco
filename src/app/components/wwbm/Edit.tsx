@@ -4,8 +4,9 @@ import { useRouter } from 'next/router';
 import Modal from '../modals/modalTemplate';
 import { EditScreenProps, ValidationErrors, WwbmQuestion } from '@/app/util/wwbm.types';
 import WWbmEditableHeader from './WwbmEditableHeader';
+import { getSupabase } from '@/app/services/supabaseClient';
 
-const EditMillionaire: React.FC<EditScreenProps> = ({ wwbmQuestions: initialQuestions, title: initialTitle }) => {
+const EditMillionaire: React.FC<EditScreenProps> = ({ wwbmQuestions: initialQuestions, title: initialTitle, text }) => {
     const router = useRouter();
     const [questions, setQuestions] = useState<WwbmQuestion[]>(initialQuestions);
     const [title, setTitle] = useState<string>(initialTitle);
@@ -78,6 +79,10 @@ const EditMillionaire: React.FC<EditScreenProps> = ({ wwbmQuestions: initialQues
     const handleFinishEditing = async () => {
         if (validateQuiz()) {
             setHandlingSave(true);
+            const supabase = getSupabase()
+            const { data: { user } } = await supabase.auth.getUser();
+            console.log(`User: ${user?.id}`)
+            const userId = user?.id
             try {
                 const response = await fetch('/api/wwbm/saveGame', {
                     method: 'POST',
@@ -87,6 +92,8 @@ const EditMillionaire: React.FC<EditScreenProps> = ({ wwbmQuestions: initialQues
                     body: JSON.stringify({
                         questions: questions ,
                         title,
+                        user_id: userId,
+                        text
                     }),
                 });
 
@@ -135,162 +142,7 @@ const EditMillionaire: React.FC<EditScreenProps> = ({ wwbmQuestions: initialQues
         );
     };
 
-    // return (
-    //     <div className="min-h-screen bg-gray-50 p-6 sm:p-8">
-    //         <div className="w-full max-w-3xl mx-auto">
-    //             {/* Header Section */}
-    //             <div className="flex flex-col sm:flex-row items-center sm:items-start mb-8">
-    //                 <h1 className="text-3xl sm:text-5xl font-bold text-center sm:text-left text-black
-    //                     tracking-wider uppercase mb-4">
-    //                     {isPreviewMode ? 'Preview Quiz' : 'Edit Quiz'}
-    //                 </h1>
 
-    //                 {/* Action Buttons */}
-    //                 <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center sm:justify-end">
-    //                     <button
-    //                         className="flex-1 sm:flex-initial bg-orange-500 text-black px-6 py-3 
-    //                             rounded-lg font-bold hover:bg-orange-600 transition duration-200"
-    //                         onClick={() => setIsPreviewMode(!isPreviewMode)}
-    //                     >
-    //                         {isPreviewMode ? 'Edit' : 'Preview'}
-    //                     </button>
-    //                     <button
-    //                         className="flex-1 sm:flex-initial bg-green-500 text-black px-6 py-3 
-    //                             rounded-lg font-bold hover:bg-green-600 transition duration-200"
-    //                         onClick={handleFinishEditing}
-    //                     >
-    //                         {handlingSave ? (
-    //                             <Loader2 size={20} className="animate-spin" />
-    //                         ) : (
-    //                             'Save & Play'
-    //                         )}
-    //                     </button>
-    //                 </div>
-    //             </div>
-
-    //             {/* Title Section */}
-    //             <div className="mb-8">
-    //                 {isPreviewMode ? (
-    //                     <h2 className="text-2xl sm:text-4xl font-bold text-black tracking-wider text-center">
-    //                         {title}
-    //                     </h2>
-    //                 ) : (
-    //                     <WWbmEditableHeader text={title} onTextChange={setTitle} />
-    //                 )}
-    //             </div>
-
-    //             {/* Questions Section */}
-    //             <div className="space-y-6">
-    //                 {questions.map((question, questionIndex) => (
-    //                     <div key={questionIndex} className="bg-black rounded-lg p-4 shadow-lg">
-    //                         {isPreviewMode ? (
-    //                             <div
-    //                                 onClick={() => handleCardClick(question)}
-    //                                 className="cursor-pointer  p-4 rounded transition"
-    //                             >
-    //                                 <h3 className="font-bold text-lg mb-4">{question.question}</h3>
-    //                                 <div className="grid grid-cols-2 gap-4">
-    //                                     {question.content.map((option, optionIndex) => (
-    //                                         <div
-    //                                             key={optionIndex}
-    //                                             className="border rounded p-2 text-center hover:bg-purple-500"
-    //                                         >
-    //                                             {option}
-    //                                         </div>
-    //                                     ))}
-    //                                 </div>
-    //                             </div>
-    //                         ) : (
-    //                             <div className="space-y-4">
-    //                                 <div>
-    //                                     <label className="block text-sm font-bold mb-2">Question</label>
-    //                                     <input
-    //                                         type="text"
-    //                                         value={question.question}
-    //                                         onChange={(e) => handleQuestionChange(questionIndex, 'question', e.target.value)}
-    //                                         className="w-full border rounded p-2 text-black"
-    //                                     />
-    //                                 </div>
-                                    
-    //                                 <div className="grid grid-cols-2 gap-4">
-    //                                     {question.content.map((option, optionIndex) => (
-    //                                         <div key={optionIndex}>
-    //                                             <label className="block text-sm font-bold mb-2">
-    //                                                 Option {optionIndex + 1}
-    //                                             </label>
-    //                                             <input
-    //                                                 type="text"
-    //                                                 value={option}
-    //                                                 onChange={(e) => handleOptionChange(questionIndex, optionIndex, e.target.value)}
-    //                                                 className="w-full border rounded p-2 text-black"
-    //                                             />
-    //                                         </div>
-    //                                     ))}
-    //                                 </div>
-
-    //                                 <div>
-    //                                     <label className="block text-sm font-bold mb-2">Correct Answer</label>
-    //                                     <select
-    //                                         value={question.correct}
-    //                                         onChange={(e) => handleQuestionChange(questionIndex, 'correct', e.target.value)}
-    //                                         className="w-full border rounded p-2 text-black"
-    //                                     >
-    //                                         <option value="">Select correct answer</option>
-    //                                         {question.content.map((option, idx) => (
-    //                                             <option key={idx} value={option}>
-    //                                                 {option}
-    //                                             </option>
-    //                                         ))}
-    //                                     </select>
-    //                                 </div>
-    //                                 {renderErrorMessages(validationErrors[`question-${questionIndex}`] || [])}
-    //                             </div>
-    //                         )}
-    //                     </div>
-    //                 ))}
-    //             </div>
-
-    //             {/* Preview Modal */}
-    //             <Modal isOpen={!!selectedQuestion} onClose={handleCloseModal}>
-    //                 {selectedQuestion && (
-    //                     <div className="text-gray-800">
-    //                         <h3 className="text-xl font-bold mb-6">{selectedQuestion.question}</h3>
-    //                         <div className="grid grid-cols-2 gap-4 mb-6">
-    //                             {selectedQuestion.content.map((option, index) => (
-    //                                 <div
-    //                                     key={index}
-    //                                     className={`border rounded p-3 text-center ${
-    //                                         showAnswer && option === selectedQuestion.correct
-    //                                             ? 'bg-green-100 border-green-500'
-    //                                             : ''
-    //                                     }`}
-    //                                 >
-    //                                     {option}
-    //                                 </div>
-    //                             ))}
-    //                         </div>
-    //                         <div className="flex justify-center gap-4">
-    //                             <button
-    //                                 onClick={() => setShowAnswer(true)}
-    //                                 className="bg-blue-500 text-white px-6 py-2 rounded-lg 
-    //                                     font-bold hover:bg-blue-600 transition duration-200"
-    //                             >
-    //                                 Show Answer
-    //                             </button>
-    //                             <button
-    //                                 onClick={handleCloseModal}
-    //                                 className="bg-gray-500 text-white px-6 py-2 rounded-lg 
-    //                                     font-bold hover:bg-gray-600 transition duration-200"
-    //                             >
-    //                                 Close
-    //                             </button>
-    //                         </div>
-    //                     </div>
-    //                 )}
-    //             </Modal>
-    //         </div>
-    //     </div>
-    // );
     return (
         <div className="min-h-screen bg-white p-6 sm:p-8">
             <div className="w-full max-w-3xl mx-auto">

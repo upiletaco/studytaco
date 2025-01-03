@@ -335,7 +335,7 @@ const HomeScreen: React.FC<AIJeopardyProps> = ({ onJeopardyDataGenerated }) => {
                     )} */}
                     <LoadingText isVisible={isGenerating || isProcessing} />
 
-                    <h2 className='relative px-16 py-8 text-[#FFCC00] font-semibold text-center'>AI Jeopardy is built by Taco Learn. Education should be fun, so we are building products to turn your learning into games.</h2>
+                    <h2 className='relative px-16 py-8 text-[#FFCC00] font-semibold text-center'>AI Jeopardy is built by Study Taco. Education should be fun, so we are building products to turn your learning into games.</h2>
 
                 </div>
                 <DiscoverBoards />

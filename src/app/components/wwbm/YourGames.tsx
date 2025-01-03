@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import posthog from 'posthog-js';
 import { WwbmGame } from '@/app/util/wwbm.types';
-import {  Play, Users } from 'lucide-react';
+import { Clock, Play, Star, Users } from 'lucide-react';
 import LoadingPage from '../LoadingPage';
+import { getSupabase } from '@/app/services/supabaseClient';
 
 // interface BoardData {
 //   alias: string | null;
@@ -13,15 +14,36 @@ import LoadingPage from '../LoadingPage';
 //   is_public: boolean;
 // }
 
-const DiscoverGames = () => {
+const UserGames = () => {
   const [games, setGames] = useState<WwbmGame[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+
+
   const router = useRouter();
 
   useEffect(() => {
     const fetchBoards = async () => {
+
       try {
-        const response = await fetch('/api/wwbm/getAllGames');
+        const supabase = getSupabase()
+        const { data: { user } } = await supabase.auth.getUser();
+
+        const user_id = user?.id
+
+        if (user_id == null) {
+          return
+        }
+
+        const response = await fetch('/api/wwbm/getUserGames', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            user_id: user_id
+          })
+        });
         const data = await response.json();
         setGames(data.data.reverse());
       } catch (error) {
@@ -45,9 +67,9 @@ const DiscoverGames = () => {
   }
 
   return (
-  <div className="p-4">
+    <div className="p-4">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Discover Games</h2>
+        <h2 className="text-2xl font-bold">Your Games</h2>
         <select className="bg-white border rounded-lg px-3 py-2 text-sm">
           <option>All Categories</option>
           <option>History</option>
@@ -71,14 +93,14 @@ const DiscoverGames = () => {
                 <Users size={16} />
                 <span>100</span>
               </div>
-              {/* <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1">
                 <Clock size={16} />
                 <span>10</span>
-              </div> */}
-              {/* <div className="flex items-center gap-1">
+              </div>
+              <div className="flex items-center gap-1">
                 <Star size={16} className="text-yellow-500 fill-yellow-500" />
                 <span>4.8</span>
-              </div> */}
+              </div>
             </div>
 
             <button onClick={() => handleGameClick(game.id, game.alias)} className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg flex items-center justify-center gap-2 transition-colors">
@@ -92,4 +114,4 @@ const DiscoverGames = () => {
   )
 };
 
-export default DiscoverGames;
+export default UserGames;

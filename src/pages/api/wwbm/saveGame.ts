@@ -6,13 +6,14 @@ export default async function handler(
     res: NextApiResponse,
 ) {
     try {
-        const { questions, title } = await req.body;
+        const { questions, title, user_id, text } = await req.body;
 
         console.log(`Questions: ${questions}`);
         console.log(`Title: ${title}`);
+        console.log(`User_id: ${user_id}`)
 
         // const game_id = 1;
-        const game_id = await insertWwbmMatch(questions, title);
+        const game_id = await insertWwbmMatch(questions, title, user_id, text);
         return res.status(200).json({ "id": game_id });
     } catch (error) {
         console.error("API error:", error);
