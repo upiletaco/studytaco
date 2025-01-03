@@ -1,5 +1,5 @@
 import React from 'react'
-import { GeometricTaco } from './survey/illustrations/Taco'
+import Image from 'next/image';
 
 
 const LoadingPage = () => {
@@ -8,7 +8,10 @@ const LoadingPage = () => {
 
 
             <div className="max-w-sm  p-6 w-full">
-                <GeometricTaco />
+                <div className='flex justify-center'>
+                <Image src="/taco-design.png" alt="Taco" width={128} height={128} />
+
+                </div>
 
                 <h1 className="text-3xl font-serif text-center mb-12 text-black animate-pulse">
                     Loading ...
