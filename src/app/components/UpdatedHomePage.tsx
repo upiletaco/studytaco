@@ -23,11 +23,11 @@ const GamePage = () => {
           <div className="flex-1 space-y-6 text-center">
             <div className="flex flex-col md:flex-row items-center justify-center gap-2">
               <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
-                Welcome to
+                Turn Study Time Into
               </h1>
               <div className="flex flex-col md:flex-row items-center gap-2">
                 <span className="bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent text-4xl md:text-5xl font-bold">
-                  StudyTaco
+                  Game Time
                 </span>
                 <Image
                   src="/taco-design.png"
