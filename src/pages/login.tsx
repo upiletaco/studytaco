@@ -33,9 +33,17 @@ const SignUpPage = () => {
 
         </div>
 
-        <h1 className="text-3xl font-serif text-center mb-12 text-black">
-          Welcome to Study Taco!
-        </h1>
+        <div className="flex flex-col  items-center justify-center gap-2 pb-16">
+                      <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
+                        Welcome to
+                      </h1>
+                      <div className="flex flex-col md:flex-row items-center gap-2">
+                        <span className="bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent text-4xl md:text-5xl font-bold">
+                          StudyTaco
+                        </span>
+                       
+                      </div>
+                    </div>
 
         <div className="space-y-4">
           <button

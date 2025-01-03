@@ -7,7 +7,7 @@ const LivesDisplay = ({ lives }: { lives: number }) => (
         {[...Array(5)].map((_, i) => (
             <div
                 key={i}
-                className={`transition-all duration-500 transform ${i >= lives ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
+                className={`transition-all duration-1000 transform ${i >= lives ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
             >
                 <img 
                         src="/taco-design.png" 
