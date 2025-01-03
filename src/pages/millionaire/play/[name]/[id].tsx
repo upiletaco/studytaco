@@ -45,32 +45,6 @@ const PlayWwbm = () => {
     const [isPublic, setIsPublic] = useState<boolean>(false)
 
 
-    const refetchGameData = async () => {
-        console.log("Fetching the new game")
-        try {
-            const response = await fetch('/api/wwbm/getGame', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    "game_id": id,
-                }),
-            });
-            if (!response.ok) {
-                throw new Error('Failed to retrieve game');
-            }
-            const { data, questions } = await response.json();
-            console.log("the updated questions: ")
-            console.log(questions.questions)
-            setGameData(questions.questions);
-            // Update other state if needed
-            return true;
-        } catch (err) {
-            console.error('Error refetching game data:', err);
-            return false;
-        }
-    };
 
     useEffect(() => {
         setLink(`${window.location.origin}${router.asPath}`)
@@ -168,7 +142,7 @@ const PlayWwbm = () => {
             </div>
         );
     }
-    return <Game title={gameTitle} questions={gameData} link={link!} onNeedMoreQuestions={refetchGameData}
+    return <Game title={gameTitle} questions={gameData} link={link!} 
     />
 
 }

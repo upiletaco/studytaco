@@ -19,12 +19,11 @@ export interface PlayWwbmProps {
     title: string,
     questions: QuestionData[]
     link: string;
-    onNeedMoreQuestions: () => Promise<boolean>;
 
 
 }
 
-const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link, onNeedMoreQuestions }) => {
+const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);

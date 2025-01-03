@@ -19,8 +19,7 @@ interface Question {
 interface QuizData {
     questions: Question[];
 }
-interface APIResponse {
-}
+
 
 export const maxDuration = 180;
 if (!groq) {
@@ -39,7 +38,7 @@ export const config = {
 
 export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse<APIResponse | { error: string; details?: string }>,
+    res: NextApiResponse,
 ) {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "POST");
