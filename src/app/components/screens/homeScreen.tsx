@@ -6,7 +6,6 @@ import DiscoverBoards from '../discoverBoards';
 import posthog from 'posthog-js';
 import HowToPlayModal from '../modals/instructionsModal';
 import YoutubeInput from '../YoutubeInput';
-import HeaderBar from '../HeaderBar';
 import Navbar from '../Navbar';
 
 interface UploadedFile extends File {
@@ -20,9 +19,7 @@ const HomeScreen: React.FC<AIJeopardyProps> = ({ onJeopardyDataGenerated }) => {
     const [error, setError] = useState<string | null>(null);
     const [extractedText, setExtractedText] = useState<string>('');
     const [generatedQuestions, setGeneratedQuestions] = useState<string>('');
-
     const [isGenerating, setIsGenerating] = useState(false);
-    // const [jeopardyValues, setJeopardyValues] = useState<JeopardyData>();
     const [transcriptFound, setTranscriptFound] = useState(false);
 
 
@@ -164,40 +161,16 @@ const HomeScreen: React.FC<AIJeopardyProps> = ({ onJeopardyDataGenerated }) => {
 
         <div className="min-h-screen bg-[#060CE9] flex items-center justify-center relative">
 
-
-            {/* <div className="absolute flex top-4 right-4"> 
-                <UserMenu />
-
-
-            </div>
-            <div className="absolute flex top-4 left-4"> 
-                <StreakCounter />
-
-            </div> */}
-
             <div className="max-w-6xl w-full px-8 py-4">
 
-                {/* <div className="absolute top-0 left-0 right-0 p-2">
-                    <div className="max-w-7xl mx-auto flex justify-between">
-                        <div className="z-10 flex items-center">
-                            <StreakCounter />
-                        </div>
-
-                        <div className="z-10 flex items-center">
-                            <UserMenu />
-                        </div>
-                    </div>
-                </div> */}
-                {/* <HeaderBar/> */}
-                <Navbar instructions='jeopardy' backgroundColor='bg-[#060CE9]'/>
+                <Navbar instructions='jeopardy' backgroundColor='bg-[#060CE9]' foregroundColor='text-white' />
 
                 <div className="flex flex-col items-center ">
-                <h1 className="text-3xl font-bold text-center text-[#FFCC00] 
+                    <h1 className="text-3xl font-bold text-center text-[#FFCC00] 
             tracking-wider uppercase drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]
             font-serif mt-14 mb-4">
                         AI Jeopardy!
                     </h1>
-
 
                     <label
                         className={`mb-4
@@ -230,10 +203,7 @@ const HomeScreen: React.FC<AIJeopardyProps> = ({ onJeopardyDataGenerated }) => {
 
                     <YoutubeInput onTranscriptFound={handleTranscriptFound} onError={handleTranscriptError} />
 
-
                     <HowToPlayModal />
-
-
 
                     {error && (
                         <div className="w-full bg-red-500 text-white p-4 rounded-lg">
@@ -244,9 +214,6 @@ const HomeScreen: React.FC<AIJeopardyProps> = ({ onJeopardyDataGenerated }) => {
                     {(files.length > 0 || transcriptFound) && (
                         <div className="w-full space-y-6 text-center">
                             <div className="bg-[#000080] border-2 border-[#FFCC00] rounded-lg p-6">
-
-
-
 
                                 {files.length > 0 ? (<h2 className="text-[#FFCC00] font-bold text-xl mb-4">
                                     Uploaded File:
@@ -262,17 +229,6 @@ const HomeScreen: React.FC<AIJeopardyProps> = ({ onJeopardyDataGenerated }) => {
                                 </div>)}
 
 
-                                {/* {extractedText && (
-                                    <div className="mt-4">
-                                        <h3 className="text-[#FFCC00] font-bold mb-2">Extracted Text:</h3>
-                                        <div className="bg-white/10 p-4 rounded-lg text-white text-sm max-h-60 overflow-y-auto">
-                                            <pre className="whitespace-pre-wrap font-mono">
-                                                {extractedText}
-                                            </pre>
-                                        </div>
-                                    </div>
-                                )} */}
-
 
                                 {generatedQuestions && (
                                     <div className="mt-6">
@@ -286,18 +242,6 @@ const HomeScreen: React.FC<AIJeopardyProps> = ({ onJeopardyDataGenerated }) => {
                                 )}
                             </div>
 
-                            {/* <button
-                className={`
-                  w-full bg-[#FFCC00] hover:bg-[#FFD700] 
-                  text-[#000080] font-bold text-xl py-4 rounded-lg
-                  transition duration-200 transform hover:scale-105
-                  shadow-lg uppercase tracking-wide
-                  ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}
-                `}
-                disabled={isProcessing}
-              >
-                Generate Jeopardy Board
-              </button> */}
 
                             <button
                                 className={`
@@ -313,28 +257,8 @@ const HomeScreen: React.FC<AIJeopardyProps> = ({ onJeopardyDataGenerated }) => {
                                 {isGenerating ? 'Generating Questions...' : 'Generate Jeopardy Board'}
                             </button>
                         </div>
-                    )
+                    )}
 
-
-                    }
-
-                    {/* {generatedQuestions != "" && (
-                        <button
-                            className={`
-   w-full bg-[#FFCC00] hover:bg-[#FFD700] 
-   text-[#000080] font-bold text-xl py-4 rounded-lg
-   transition duration-200 transform hover:scale-105
-   shadow-lg uppercase tracking-wide
-   ${(isProcessing || isGenerating) ? 'opacity-50 cursor-not-allowed' : ''}
- `}
-                            disabled={isProcessing || isGenerating}
-                            onClick={generateQuestions}
-                        >
-                            {isGenerating ? 'Generating Questions...' : 'Generate Jeopardy Board'}
-                        </button>
-
-
-                    )} */}
                     <LoadingText isVisible={isGenerating || isProcessing} />
 
                     <h2 className='relative px-16 py-8 text-[#FFCC00] font-semibold text-center'>AI Jeopardy is built by Study Taco. Education should be fun, so we are building products to turn your learning into games.</h2>

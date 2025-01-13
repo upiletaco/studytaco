@@ -372,7 +372,7 @@ const createBotEntries = async (leaderboardId: string): Promise<boolean> => {
         const botEntries = BOT_NAMES.map(name => ({
             leaderboard_id: leaderboardId,
             username: name,
-            score: Math.floor(Math.random() * 500) * 100, // Random scores between 0-50,000
+            score: (Math.floor(Math.random() * 10) + 1) * 10,
             is_bot: true
         }));
 

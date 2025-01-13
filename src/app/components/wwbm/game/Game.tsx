@@ -14,7 +14,6 @@ import { StreakPopup } from './StreakPopup';
 import { addExperience, updateLeaderboardEntry } from '@/app/services/wwbmService';
 import { getSupabase } from '@/app/services/supabaseClient';
 import LoadingQuestionCard from './LoadingQuestionCard';
-import DesktopPrizes from './DesktopPrizes';
 import GameLeaderboard from './GameLeaderboard';
 import { RankChangePopup } from './RankChangePopup';
 
@@ -50,28 +49,78 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
     const [showLeaderboard, setLeaderboard] = useState<boolean>(false)
     const [showRankChange, setShowRankChange] = useState(false);
     const [newRank, setNewRank] = useState<number | null>(null);
-    const [previousRank, setPreviousRank] = useState<number | null>(null);
     const supabase = getSupabase()
     const [userId, setUserId] = useState('');
+    const [players, setPlayers] = useState<LeaderboardEntry[]>([]);
+    const [leaderboardId, setLeaderboardId] = useState<string | null>(null);
+    const [previousRank, setPreviousRank] = useState<number | null>(null);
 
-    const handleRankChange = (rank: number) => {
-        // Update the new rank
-        setNewRank(rank);
-        // Check if this is an improvement (lower number is better)
-        const isImprovement = previousRank ? rank < previousRank : false;
-        // Update the previous rank for next comparison
-        setPreviousRank(rank);
-        // Show the popup
-        setShowRankChange(true);
-    
-        // Hide the popup after 2 seconds
-        const timeoutId = setTimeout(() => {
-            setShowRankChange(false);
-        }, 2000);
-    
-        // Clean up the timeout if the component unmounts
-        return () => clearTimeout(timeoutId);
-    };
+    // Add this useEffect to track rank changes independently
+    useEffect(() => {
+        if (!userId || players.length === 0) return;
+        
+        const currentRank = players.find(p => p.user_id === userId)?.rank || null;
+        
+        if (previousRank !== null && 
+            currentRank !== null && 
+            currentRank !== previousRank) {
+            handleRankChange(currentRank);
+        }
+        
+        setPreviousRank(currentRank);
+    }, [players, userId]);
+    useEffect(() => {
+        const fetchUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                setUserId(user.id);
+            }
+        };
+        fetchUser();
+    }, [supabase]);
+
+
+    useEffect(() => {
+        const fetchLeaderboard = async () => {
+            const { data: leaderboard } = await supabase
+                .from('leaderboards')
+                .select('id')
+                .eq('game_id', getGameId(link))
+                .single();
+
+            if (leaderboard?.id) {
+                setLeaderboardId(leaderboard.id);
+                const { data: retrievedPlayers } = await supabase
+                    .from('leaderboard_entries')
+                    .select('*')
+                    .eq('leaderboard_id', leaderboard.id);
+
+                if (retrievedPlayers) {
+                    setPlayers(retrievedPlayers as LeaderboardEntry[]);
+                }
+            }
+        };
+
+        fetchLeaderboard();
+
+        // Set up real-time subscription
+        const subscription = supabase
+            .channel(`leaderboard-${getGameId(link)}`)
+            .on('postgres_changes', {
+                event: '*',
+                schema: 'public',
+                table: 'leaderboard_entries',
+                filter: `leaderboard_id=eq.${getGameId(link)}`
+            }, () => {
+                fetchLeaderboard();
+            })
+            .subscribe();
+
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, [link, supabase]);
+
     useEffect(() => {
         console.log(questions)
         setCurrentQuestion(questions[currentQuestionIndex]);
@@ -227,7 +276,7 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
             return
         }
 
-        const { user_metadata: { picture, full_name } } = user;
+        const { user_metadata: {full_name } } = user;
 
 
         const { data: leaderboard } = await supabase
@@ -248,16 +297,19 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
 
     }
 
+    const handleRankChange = (rank: number) => {
+        setNewRank(rank);
+        setShowRankChange(true);
+        console.log(`New rank: ${rank}`)
+    
+        setTimeout(() => {
+            setShowRankChange(false);
+        }, 2000);
+    
+    };
 
-    useEffect(() => {
-        const fetchUser = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                setUserId(user.id);
-            }
-        };
-        fetchUser();
-    }, [supabase]);
+
+ 
 
 
 
@@ -283,49 +335,8 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
         setLeaderboard(!curr)
     }
 
-    const [players, setPlayers] = useState<LeaderboardEntry[]>([]);
-    const [leaderboardId, setLeaderboardId] = useState<string | null>(null);
 
-    useEffect(() => {
-        const fetchLeaderboard = async () => {
-            const { data: leaderboard } = await supabase
-                .from('leaderboards')
-                .select('id')
-                .eq('game_id', getGameId(link))
-                .single();
 
-            if (leaderboard?.id) {
-                setLeaderboardId(leaderboard.id);
-                const { data: retrievedPlayers } = await supabase
-                    .from('leaderboard_entries')
-                    .select('*')
-                    .eq('leaderboard_id', leaderboard.id);
-
-                if (retrievedPlayers) {
-                    setPlayers(retrievedPlayers as LeaderboardEntry[]);
-                }
-            }
-        };
-
-        fetchLeaderboard();
-
-        // Set up real-time subscription
-        const subscription = supabase
-            .channel(`leaderboard-${getGameId(link)}`)
-            .on('postgres_changes', {
-                event: '*',
-                schema: 'public',
-                table: 'leaderboard_entries',
-                filter: `leaderboard_id=eq.${getGameId(link)}`
-            }, () => {
-                fetchLeaderboard();
-            })
-            .subscribe();
-
-        return () => {
-            subscription.unsubscribe();
-        };
-    }, [link, supabase]);
 
     const updatePlayers = (currentScore: number) => {
         if (!leaderboardId) return;
@@ -410,15 +421,7 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
                     />
                 )}
 
-                {/* {showLeaderboard &&
-                    <GameLeaderboard
-                        gameId={getGameId(link)}
-                        alias={title}
-                        handlePrizes={onLeaderboardSelect}
-                        currentScore={score}
-                        userId={''}
-                        onRankChange={handleRankChange}
-                    />} */}
+
                 {showLeaderboard && (
                     <GameLeaderboard
                         gameId={getGameId(link)}
@@ -426,7 +429,7 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
                         handlePrizes={onLeaderboardSelect}
                         currentScore={score}
                         userId={userId}
-                        onRankChange={handleRankChange}
+                        // onRankChange={handleRankChange}
                         players={players}
                         updatePlayers={updatePlayers}
                     />
@@ -434,7 +437,7 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
                 <RankChangePopup
                     show={showRankChange}
                     newRank={newRank || 0}
-                    isImprovement={previousRank ? (newRank || 0) < previousRank : false}
+                    isImprovement={true}
                 />
             </div>
         </div>

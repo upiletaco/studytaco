@@ -9,12 +9,13 @@ import { FileQuestionIcon } from 'lucide-react';
 
 interface NavbarProps {
     instructions?: string;
-    backgroundColor?: string; 
+    backgroundColor?: string;
     foregroundColor?: string;
 
 }
 
-const Navbar: React.FC<NavbarProps> = ({ instructions,  backgroundColor = 'bg-white' }) => {
+const Navbar: React.FC<NavbarProps> = ({ instructions, backgroundColor = 'bg-white', foregroundColor = 'text-black'
+}) => {
     const [user, setUser] = useState<User | null>(null);
     const router = useRouter();
 
@@ -52,10 +53,12 @@ const Navbar: React.FC<NavbarProps> = ({ instructions,  backgroundColor = 'bg-wh
                     </div>
 
                     <div className="sm:absolute sm:left-1/2 sm:-translate-x-1/2 flex space-x-6">
-                        <button onClick={() => router.push('/home')} className="hover:text-gray-600">
+                        <button onClick={() => router.push('/home')} className={`${foregroundColor} hover:opacity-80 transition-opacity`}
+                        >
                             Home
                         </button>
-                        <a href="mailto:support@studytaco.com" className="hover:text-gray-600">
+                        <a href="mailto:support@studytaco.com" className={`${foregroundColor} hover:opacity-80 transition-opacity`}
+                        >
                             Support
                         </a>
                     </div>
@@ -74,7 +77,8 @@ const Navbar: React.FC<NavbarProps> = ({ instructions,  backgroundColor = 'bg-wh
                         <div className="flex items-center space-x-4">
                             {instructions && (
                                 <FileQuestionIcon
-                                    className="cursor-pointer w-6 h-6"
+                                color={foregroundColor === 'text-white' ? 'white' : foregroundColor.replace('text-', '')}
+                                className={`cursor-pointer w-6 h-6 `}
                                     onClick={handleInstructions}
                                 />
                             )}

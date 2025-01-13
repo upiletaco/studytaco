@@ -1,16 +1,6 @@
-import { Trophy, Award, Medal, ChevronLeft, X } from 'lucide-react';
+import { Trophy, Award, X } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { LeaderboardEntry } from '@/app/util/wwbm.types';
-
-// ... other interfaces remain the same
-
-interface LeaderboardPlayer {
-  name: string;
-  score: number;
-  rank: number;
-  avatar?: string;
-
-}
 
 interface LeaderboardProps {
   players: LeaderboardEntry[];
