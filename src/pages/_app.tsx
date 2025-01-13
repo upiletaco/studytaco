@@ -21,6 +21,8 @@ function MyApp({ Component, pageProps }: AppProps) {
 
       if (isGameRoute) {
         if (!token) {
+          localStorage.setItem('redirectPath', router.asPath)
+
           router.push('/login')
         }
       } 

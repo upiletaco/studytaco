@@ -18,8 +18,14 @@ export default function AuthCallback() {
         const finishedSurvey = await checkUserSurvey()
 
         if (finishedSurvey == true) {
-          router.push('/home') // Redirect to your desired page after sign in
+          const redirectPath = localStorage.getItem('redirectPath')
 
+          if (redirectPath) {
+            localStorage.removeItem('redirectPath')
+            router.push(redirectPath)
+          } else {
+            router.push('/home')
+          }
         } else {
           router.push('/survey')
         }
@@ -36,10 +42,10 @@ export default function AuthCallback() {
 
 
     <div className="max-w-sm  p-6 w-full">
-    <div className='flex justify-center'>
-                <Image src="/taco-design.png" alt="Taco" width={128} height={128} />
+      <div className='flex justify-center'>
+        <Image src="/taco-design.png" alt="Taco" width={128} height={128} />
 
-                </div>
+      </div>
 
       <h1 className="text-3xl font-serif text-center mb-12 text-black">
         Loading ...
