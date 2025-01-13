@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Leaderboard from "../Leaderboard";
 import { LeaderboardEntry } from "@/app/util/wwbm.types";
 
@@ -24,7 +24,7 @@ interface GameLeaderboardProps {
     updatePlayers
 }) => {
     //   const [players, setPlayers] = useState<LeaderboardEntry[]>([]);
-    const [previousRank, setPreviousRank] = useState<number | null>(null);
+    // const [previousRank, setPreviousRank] = useState<number | null>(null);
 
     useEffect(() => {
         updatePlayers(currentScore);
