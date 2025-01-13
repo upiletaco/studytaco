@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { prizeLadder } from '@/app/util/wwbm.types';
+import { LeaderboardEntry, prizeLadder } from '@/app/util/wwbm.types';
 import CongratsPage from './EndGame';
 import { Option, QuestionData } from '@/pages/millionaire/play/[name]/[id]'
 import MillionaireTitleBar from './TitleBar';
@@ -11,9 +11,11 @@ import FollowUpFriendModal from './FollowUpFriendModal';
 import AudienceModal from './AudienceModal';
 import LivesDisplay from './LivesDisplay';
 import { StreakPopup } from './StreakPopup';
-import { addExperience } from '@/app/services/wwbmService';
+import { addExperience, updateLeaderboardEntry } from '@/app/services/wwbmService';
 import { getSupabase } from '@/app/services/supabaseClient';
 import LoadingQuestionCard from './LoadingQuestionCard';
+import GameLeaderboard from './GameLeaderboard';
+import { RankChangePopup } from './RankChangePopup';
 
 export interface PlayWwbmProps {
     title: string,
@@ -44,6 +46,80 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
     const [streak, setStreak] = useState(0);
     const [showStreakPopup, setShowStreakPopup] = useState(false);
     const [loadingMoreQuestions, setLoadingMoreQuestions] = useState<boolean>(false)
+    const [showLeaderboard, setLeaderboard] = useState<boolean>(false)
+    const [showRankChange, setShowRankChange] = useState(false);
+    const [newRank, setNewRank] = useState<number | null>(null);
+    const supabase = getSupabase()
+    const [userId, setUserId] = useState('');
+    const [players, setPlayers] = useState<LeaderboardEntry[]>([]);
+    const [leaderboardId, setLeaderboardId] = useState<string | null>(null);
+    const [previousRank, setPreviousRank] = useState<number | null>(null);
+
+    // Add this useEffect to track rank changes independently
+    useEffect(() => {
+        if (!userId || players.length === 0) return;
+        
+        const currentRank = players.find(p => p.user_id === userId)?.rank || null;
+        
+        if (previousRank !== null && 
+            currentRank !== null && 
+            currentRank !== previousRank) {
+            handleRankChange(currentRank);
+        }
+        
+        setPreviousRank(currentRank);
+    }, [players, userId]);
+    useEffect(() => {
+        const fetchUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                setUserId(user.id);
+            }
+        };
+        fetchUser();
+    }, [supabase]);
+
+
+    useEffect(() => {
+        const fetchLeaderboard = async () => {
+            const { data: leaderboard } = await supabase
+                .from('leaderboards')
+                .select('id')
+                .eq('game_id', getGameId(link))
+                .single();
+
+            if (leaderboard?.id) {
+                setLeaderboardId(leaderboard.id);
+                const { data: retrievedPlayers } = await supabase
+                    .from('leaderboard_entries')
+                    .select('*')
+                    .eq('leaderboard_id', leaderboard.id);
+
+                if (retrievedPlayers) {
+                    setPlayers(retrievedPlayers as LeaderboardEntry[]);
+                }
+            }
+        };
+
+        fetchLeaderboard();
+
+        // Set up real-time subscription
+        const subscription = supabase
+            .channel(`leaderboard-${getGameId(link)}`)
+            .on('postgres_changes', {
+                event: '*',
+                schema: 'public',
+                table: 'leaderboard_entries',
+                filter: `leaderboard_id=eq.${getGameId(link)}`
+            }, () => {
+                fetchLeaderboard();
+            })
+            .subscribe();
+
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, [link, supabase]);
 
     useEffect(() => {
         console.log(questions)
@@ -52,11 +128,7 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
 
     const getGameId = (link: string) => {
         return link.split('/').pop() || '';
-    };
-
-
-
-
+    }
     const handleLifeline = (lifeline: string) => {
         if (usedLifelines.has(lifeline) || selectedAnswerId !== null) return;
 
@@ -66,13 +138,9 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
         switch (lifeline) {
             case 'fifty-fifty':
                 correctOption = currentQuestion.options.find(opt => opt.correct);
-                // Get all incorrect answers
                 incorrectOptions = currentQuestion.options.filter(opt => !opt.correct);
-                // Randomly select one incorrect answer
                 const randomIncorrectOption = incorrectOptions[Math.floor(Math.random() * incorrectOptions.length)];
-
                 if (correctOption && randomIncorrectOption) {
-                    // Randomly order the two options
                     const orderedOptions = Math.random() < 0.5
                         ? [correctOption, randomIncorrectOption]
                         : [randomIncorrectOption, correctOption];
@@ -157,9 +225,6 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
                 });
 
 
-
-
-
                 if (response.ok) {
 
                     // await new Promise(resolve => setTimeout(resolve, 1000));
@@ -207,15 +272,44 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
 
         const user_id = user?.id
 
-        if (user_id == null) {
+        if (user_id == null || user == null) {
             return
         }
+
+        const { user_metadata: {full_name } } = user;
+
+
+        const { data: leaderboard } = await supabase
+            .from('leaderboards')
+            .select('id')
+            .eq('game_id', getGameId(link))
+            .single();
+
+        await updateLeaderboardEntry(
+            leaderboard!.id,
+            user_id,
+            full_name,
+            score
+        );
+
         console.log(`Adding xp for ${user_id}`)
         addExperience(score, user_id)
 
     }
 
+    const handleRankChange = (rank: number) => {
+        setNewRank(rank);
+        setShowRankChange(true);
+        console.log(`New rank: ${rank}`)
+    
+        setTimeout(() => {
+            setShowRankChange(false);
+        }, 2000);
+    
+    };
 
+
+ 
 
 
 
@@ -236,24 +330,68 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
         setLives(5)
     };
 
+    const onLeaderboardSelect = () => {
+        const curr = showLeaderboard
+        setLeaderboard(!curr)
+    }
+
+
+
+
+    const updatePlayers = (currentScore: number) => {
+        if (!leaderboardId) return;
+
+        let allPlayers = [...players];
+        // fix user Id
+        const currentPlayerIndex = allPlayers.findIndex(p => p.user_id === userId);
+
+        if (currentPlayerIndex === -1) {
+            // Add temporary player if they don't exist
+            const temporaryPlayer: LeaderboardEntry = {
+                id: 'temp-' + userId,
+                user_id: userId,
+                username: 'You',
+                score: currentScore,
+                leaderboard_id: leaderboardId,
+                rank: null,
+                is_bot: false,
+                created_at: null,
+                updated_at: null
+            };
+            allPlayers.push(temporaryPlayer);
+        } else {
+            // Update existing player's score
+            allPlayers[currentPlayerIndex].score = currentScore;
+        }
+
+        // Sort players by score
+        allPlayers.sort((a, b) => b.score - a.score);
+
+        // Update ranks
+        allPlayers = allPlayers.map((player, index) => ({
+            ...player,
+            rank: index + 1
+        }));
+
+        setPlayers(allPlayers);
+    };
 
     if (gameOver == true) return (
         <CongratsPage isCorrect={isCorrect} score={score} correctAnswers={correctAnswers} resetGame={resetGame} link={link} title={title} />
     )
     return (
         <div className="min-h-screen bg-gray-50 flex justify-center">
-            {/* <DesktopPrizes currentQuestionIndex={currentQuestionIndex} /> */}
 
 
             <div className='w-full max-w-[600px]  text-black flex flex-col'>
                 {/* <StreakCounter streak={streak} /> */}
 
-                <MillionaireTitleBar title={title} currentQuestionIndex={currentQuestionIndex} questionLength={questions.length} score={score} handlePrizes={() => { }} streak={streak} />
+                <MillionaireTitleBar title={title} currentQuestionIndex={currentQuestionIndex} questionLength={questions.length} score={score} handlePrizes={onLeaderboardSelect} streak={streak} />
 
                 <LivesDisplay lives={lives} />
                 {loadingMoreQuestions == false && <QuestionCard points={prizeLadder[currentQuestionIndex]} question={currentQuestion} handleAnswerSelect={handleAnswerSelect} lives={lives} />
                 }
-                {loadingMoreQuestions == true && <LoadingQuestionCard/>}
+                {loadingMoreQuestions == true && <LoadingQuestionCard />}
                 <GameLifelineButtons handleLifeline={handleLifeline} usedLifelines={usedLifelines} />
 
                 <StreakPopup streak={streak} show={showStreakPopup} />
@@ -268,7 +406,7 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
                         handleAnswerSelect(option);
 
                     }}
-                        handleBack={handlePhoneBack}  // Add this line
+                        handleBack={handlePhoneBack}
 
                     />
                 )}
@@ -283,6 +421,24 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
                     />
                 )}
 
+
+                {showLeaderboard && (
+                    <GameLeaderboard
+                        gameId={getGameId(link)}
+                        alias={title}
+                        handlePrizes={onLeaderboardSelect}
+                        currentScore={score}
+                        userId={userId}
+                        // onRankChange={handleRankChange}
+                        players={players}
+                        updatePlayers={updatePlayers}
+                    />
+                )}
+                <RankChangePopup
+                    show={showRankChange}
+                    newRank={newRank || 0}
+                    isImprovement={true}
+                />
             </div>
         </div>
     )
