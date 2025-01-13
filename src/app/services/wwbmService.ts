@@ -17,6 +17,12 @@ const insertWwbmMatch = async (
             return null;
         }
 
+        const leaderboardId = await createLeaderboard(game_id);
+        if (leaderboardId) {
+            // Create 5 bot entries for this leaderboard
+            await createBotEntries(leaderboardId);
+        }
+
         insertGameText(game_id, text);
 
         console.log(`Game id saved at ${game_id}`);
@@ -338,6 +344,99 @@ const addExperience = async (score: number, user_id: string) => {
     }
 };
 
+const createLeaderboard = async (gameId: string): Promise<string | null> => {
+    const supabase = getSupabase();
+    
+    try {
+        const { data, error } = await supabase
+            .from('leaderboards')
+            .insert({ game_id: gameId })
+            .select()
+            .single();
+            
+        if (error) throw error;
+        return data.id;
+    } catch (err) {
+        console.error("Error creating leaderboard:", err);
+        return null;
+    }
+};
+
+const createBotEntries = async (leaderboardId: string): Promise<boolean> => {
+    const supabase = getSupabase();
+    const BOT_NAMES = [
+        'QuizMaster', 'BrainBox', 'TriviaKing', 'WisdomSeeker', 'KnowledgeGuru'
+    ];
+
+    try {
+        const botEntries = BOT_NAMES.map(name => ({
+            leaderboard_id: leaderboardId,
+            username: name,
+            score: Math.floor(Math.random() * 500) * 100, // Random scores between 0-50,000
+            is_bot: true
+        }));
+
+        const { error } = await supabase
+            .from('leaderboard_entries')
+            .insert(botEntries);
+
+        if (error) throw error;
+        return true;
+    } catch (err) {
+        console.error("Error creating bot entries:", err);
+        return false;
+    }
+};
+
+const updateLeaderboardEntry = async (
+    leaderboardId: string,
+    userId: string,
+    username: string,
+    score: number
+): Promise<boolean> => {
+    const supabase = getSupabase();
+
+    try {
+        // First check if an entry exists for this user
+        const { data: existingEntry } = await supabase
+            .from('leaderboard_entries')
+            .select('*')
+            .eq('leaderboard_id', leaderboardId)
+            .eq('user_id', userId)
+            .single();
+
+        if (!existingEntry) {
+            // Create new entry if none exists
+            const { error: insertError } = await supabase
+                .from('leaderboard_entries')
+                .insert({
+                    leaderboard_id: leaderboardId,
+                    user_id: userId,
+                    username: username,
+                    score: score,
+                    is_bot: false
+                });
+
+            if (insertError) throw insertError;
+        } else {
+            // Update existing entry if score is higher
+            if (score > existingEntry.score) {
+                const { error: updateError } = await supabase
+                    .from('leaderboard_entries')
+                    .update({ score: score })
+                    .eq('id', existingEntry.id);
+
+                if (updateError) throw updateError;
+            }
+        }
+
+        return true;
+    } catch (err) {
+        console.error('Error updating leaderboard:', err);
+        return false;
+    }
+};
+
 export {
     addExperience,
     getAllWwbmGames,
@@ -352,4 +451,7 @@ export {
     insertWwbmMc,
     insertWwbmQuestion,
     updateWwbmHighScore,
+    createLeaderboard,
+    createBotEntries,
+    updateLeaderboardEntry
 };

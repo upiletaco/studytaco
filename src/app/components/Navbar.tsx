@@ -9,9 +9,12 @@ import { FileQuestionIcon } from 'lucide-react';
 
 interface NavbarProps {
     instructions?: string;
+    backgroundColor?: string; 
+    foregroundColor?: string;
+
 }
 
-const Navbar: React.FC<NavbarProps> = ({ instructions }) => {
+const Navbar: React.FC<NavbarProps> = ({ instructions,  backgroundColor = 'bg-white' }) => {
     const [user, setUser] = useState<User | null>(null);
     const router = useRouter();
 
@@ -27,6 +30,7 @@ const Navbar: React.FC<NavbarProps> = ({ instructions }) => {
     const handleLogin = () => {
         router.push('/login')
     }
+
     useEffect(() => {
         const getUser = async () => {
             const supabase = getSupabase();
@@ -37,7 +41,7 @@ const Navbar: React.FC<NavbarProps> = ({ instructions }) => {
     }, []);
 
     return (
-        <nav className="w-full flex justify-center">
+        <nav className={`w-full flex justify-center ${backgroundColor}`}>
             <div className="max-w-7xl w-full p-4">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="flex items-center space-x-2">

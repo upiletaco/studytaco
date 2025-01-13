@@ -97,3 +97,28 @@ export interface EditScreenProps {
     '100',
 ].reverse();
 
+
+
+
+// export interface LeaderboardEntry {
+//     id: string;
+//     user_id: string;
+//     username: string;
+//     score: number;
+//     rank: number;
+//     is_bot: boolean;
+//   }
+
+
+export interface LeaderboardEntry {
+    created_at: string | null;
+    id: string;
+    is_bot: boolean | null;
+    leaderboard_id: string | null;
+    rank: number | null;
+    score: number;
+    updated_at: string | null;
+    user_id: string | null;
+    username: string;
+    
+  }

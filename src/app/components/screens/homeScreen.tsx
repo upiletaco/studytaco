@@ -7,6 +7,7 @@ import posthog from 'posthog-js';
 import HowToPlayModal from '../modals/instructionsModal';
 import YoutubeInput from '../YoutubeInput';
 import HeaderBar from '../HeaderBar';
+import Navbar from '../Navbar';
 
 interface UploadedFile extends File {
     content?: string;
@@ -187,7 +188,8 @@ const HomeScreen: React.FC<AIJeopardyProps> = ({ onJeopardyDataGenerated }) => {
                         </div>
                     </div>
                 </div> */}
-                <HeaderBar/>
+                {/* <HeaderBar/> */}
+                <Navbar instructions='jeopardy' backgroundColor='bg-[#060CE9]'/>
 
                 <div className="flex flex-col items-center ">
                 <h1 className="text-3xl font-bold text-center text-[#FFCC00] 

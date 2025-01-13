@@ -1,28 +1,29 @@
-import { Trophy, Award, Medal, ChevronLeft } from 'lucide-react';
+import { Trophy, Award, Medal, ChevronLeft, X } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { LeaderboardEntry } from '@/app/util/wwbm.types';
 
 // ... other interfaces remain the same
 
 interface LeaderboardPlayer {
-    name: string;
-    score: number;
-    rank: number;
-    avatar?: string;
-    
-  }
-  
-  interface LeaderboardProps {
-    players: LeaderboardPlayer[];
-    title?: string;
-    onBack?: () => void;
-    gameTitle: string; // Add this
+  name: string;
+  score: number;
+  rank: number;
+  avatar?: string;
 
-  }
+}
 
-const Leaderboard: React.FC<LeaderboardProps> = ({ 
-  players, 
-  onBack, 
-  gameTitle
+interface LeaderboardProps {
+  players: LeaderboardEntry[];
+  gameTitle: string;
+  onBack?: () => void;
+  currentUserId: string;
+}
+
+const Leaderboard: React.FC<LeaderboardProps> = ({
+  players,
+  onBack,
+  gameTitle,
+  currentUserId
 }) => {
   const getTrophyIcon = (rank: number) => {
     switch (rank) {
@@ -41,56 +42,79 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
     }
   };
 
-  return (
-    <div className="p-4 max-w-3xl mx-auto">
-      {/* Header remains the same */}
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">
-          {gameTitle}
-        </h1>
-      </div>
-      {/* Top 3 Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        {players.slice(0, 3).map((player, index) => (
-          <div
-            key={player.name}
-            className="bg-gradient-to-tr from-blue-50 via-white to-purple-50 rounded-xl p-4 border border-blue-100"
-          >
-            <div className="flex items-center gap-3 mb-2">
-              {getTrophyIcon(index + 1)}
-              <span className="text-lg font-semibold text-gray-800">
-                {player.name}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Rank #{index + 1}</span>
-              <span className="font-semibold text-emerald-600">{player.score.toLocaleString()} XP</span>
-            </div>
-          </div>
-        ))}
-      </div>
+  const isCurrentPlayer = (player: LeaderboardEntry) => player.user_id === currentUserId;
 
-      {/* Rest of Leaderboard */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        {players.slice(3).map((player, index) => (
-          <div 
-            key={player.name}
-            className="flex items-center p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors"
-          >
-            <div className="w-12 flex justify-center">
-              {getTrophyIcon(player.rank)}
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-80 z-20 flex flex-col p-4">
+      <Card className="rounded-[48px] p-6 bg-gradient-to-tr from-blue-50 via-white to-orange-50 overflow-hidden relative w-full h-full">
+        <div className="absolute inset-0 bg-gradient-to-tr from-blue-300/20 via-transparent to-orange-300/20"></div>
+        <div className="relative z-10 flex flex-col h-full">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-6">
+            <div className="w-fit bg-white px-6 py-2 rounded-full text-center border-2 border-blue-100">
+              <span className="text-black text-lg font-semibold">{gameTitle}</span>
             </div>
-            <div className="flex-1">
-              <span className="font-medium text-gray-800">{player.name}</span>
+            {onBack && (
+              <button
+                onClick={onBack}
+                className="bg-white p-2 rounded-full border-2 border-blue-100"
+              >
+                <X className="w-6 h-6 text-blue-900" />
+              </button>
+            )}
+          </div>
+
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto">
+            {/* Top 3 */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              {players.slice(0, 3).map((player, index) => (
+                <div
+                  key={player.username}
+                  className={`bg-white rounded-2xl p-4 border-2 
+                      ${isCurrentPlayer(player)
+                      ? 'border-yellow-400 shadow-lg'
+                      : 'border-blue-100'}`}                  >
+                  <div className="flex items-center gap-3 mb-2">
+                    {getTrophyIcon(index + 1)}
+                    <span className="text-lg font-semibold text-gray-800">
+                      {player.username}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Rank #{index + 1}</span>
+                    <span className="font-semibold text-emerald-600">{player.score}</span>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">
-                {player.score.toLocaleString()} XP
-              </span>
+
+            {/* Rest of Leaderboard */}
+            <div className="space-y-2">
+              {players.slice(3).map((player, index) => (
+                <div
+                  key={player.username}
+                  className={`bg-white rounded-full px-6 py-3 border-2 
+                    ${isCurrentPlayer(player)
+                      ? 'border-yellow-400 shadow-lg'
+                      : 'border-blue-100'} 
+                    flex items-center`}                >
+                  <div className="w-12 flex justify-center">
+                    {getTrophyIcon(player.rank || index + 4)}
+                  </div>
+                  <div className="flex-1">
+                    <span className="font-medium text-gray-800">{player.username}</span>
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {player.score} PT
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      </Card>
     </div>
   );
 };
