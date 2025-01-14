@@ -59,12 +59,6 @@ const PhoneModal: React.FC<PhoneFriendModalProps> = ({ questions, currentQuestio
 
                     <p className="text-lg text-center mb-4 text-blue-900">Your friend suggests:</p>
 
-                    {/* <div className="bg-white px-6 py-4 mx-4 rounded-full mb-4 text-center border-2 border-blue-100">
-                        <p className='text-blue-900 font-semibold'>
-                            {friendSuggestion?.clue}
-                        </p>
-                    </div> */}
-
                     <div className="mx-4 mb-8 text-center">
                         <p className='text-xl font-bold text-blue-900'>
                             {friendSuggestion?.clue}
@@ -75,8 +69,6 @@ const PhoneModal: React.FC<PhoneFriendModalProps> = ({ questions, currentQuestio
                         <button
                             onClick={() => handleSelection('use')}
                             className={getButtonStyles('use')}
-                        //    onClick={handleTrue}
-                        //    className="bg-white px-6 py-4 mx-4 rounded-full mb-2 text-center border-2 border-green-200 hover:border-green-300"
                         >
                             <p className='text-blue-900 font-semibold'>
                                 Use Friend Answer
@@ -86,8 +78,6 @@ const PhoneModal: React.FC<PhoneFriendModalProps> = ({ questions, currentQuestio
                         <button
                             onClick={() => handleSelection('different')}
                             className={getButtonStyles('different')}
-                        // onClick={handleFalse}
-                        // className="bg-white px-6 py-4 mx-4 rounded-full mb-2 text-center border-2 border-orange-200 hover:border-orange-300"
                         >
                             <p className='text-orange-700 font-semibold'>
                                 Choose Different Answer

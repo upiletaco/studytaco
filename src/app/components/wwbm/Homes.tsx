@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { UploadedFile, WwbmHomeScreenProps, WwbmQuestion } from "@/app/util/wwbm.types";
 import FileDisplay from "./FileDisplay";
-import GenerateButton from "../GenerateButton";
+import GenerateButton from "./GenerateButton";
 import LoadingText from "../loadingText";
 import DiscoverGames from "./DiscoverGames";
 import MillionaireUpload from "./MillionaireUpload";

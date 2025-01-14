@@ -1,10 +1,10 @@
 import { GiChiliPepper } from "react-icons/gi";
 
-interface StreakCounterProps {
+interface QuestionCounterProps {
   streak: number;
 }
 
-export const StreakCounter = ({ streak }: StreakCounterProps) => {
+export const QuestionCounter = ({ streak }: QuestionCounterProps) => {
   if (streak <= 2) return null;
   
   return (

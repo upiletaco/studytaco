@@ -2,7 +2,8 @@ import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, Trophy } from 'lucide-react';
 import { useRouter } from 'next/router';
 import React from 'react'
-import { StreakCounter } from './StreakCounter';
+import { QuestionCounter } from './QuestionCounter';
+import StreakCounter from '../../StreakCounter';
 
 
 interface MillionaireTitleBarProps {
@@ -28,11 +29,14 @@ const MillionaireTitleBar: React.FC<MillionaireTitleBarProps> = ({ title, curren
         <div className='p-4'>
 
             <div className='flex justify-between items-center pb-2'>
+                <div className='flex gap-4'>
                 <ArrowLeft onClick={handleHome} className='bg-gray-200 text-gray-500 hover:bg-gray-300 rounded-3xl p-2 w-10 h-10' />
+                <StreakCounter/>
+                </div>
                 <p className='text-black text-xl font-semibold text-center'>{title}</p>
 
                 <div className='flex gap-4'>
-                    <StreakCounter streak={streak} />
+                    <QuestionCounter streak={streak} />
                     <Trophy onClick={handlePrizes} className='bg-orange-200 text-orange-600 hover:bg-orange-300 rounded-3xl p-2 w-10 h-10' />
                 </div>
             </div>
