@@ -2,7 +2,7 @@ import { Flame } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
 
 
-const StreakCounter = () => {
+const StreakTally = () => {
   const [streak, setStreak] = useState(0);
   useEffect(() => {
     const checkAndUpdateStreak = () => {
@@ -55,4 +55,4 @@ const StreakCounter = () => {
     )
 }
 
-export default StreakCounter
+export default StreakTally
