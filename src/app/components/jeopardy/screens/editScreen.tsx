@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Category, EditableGameBoardProps, Question, ValidationErrors } from '../../../data/sampleBoardData';
 import { Loader2, SendHorizonal } from 'lucide-react';
-import EditableHeader from '../../editableHeader';
 import { useRouter } from 'next/router';
 import Modal from '../modals/modalTemplate';
+import EditableHeader from '../editableHeader';
 
 
 const EditScreen: React.FC<EditableGameBoardProps> = ({ categories: initialCategories, title: initialTitle }) => {

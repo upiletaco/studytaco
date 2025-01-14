@@ -5,7 +5,7 @@ import EndGameModal from '../modals/play_screen/endGameModal';
 import CategoryTitle from '../categoryTitle';
 import { ThumbsDownIcon, ThumbsUpIcon } from 'lucide-react';
 import ShareGameModal from '../modals/play_screen/shareGameModal';
-import HighScoreDisplay from '../../localHighScore';
+import HighScoreDisplay from '../localHighScore';
 import Modal from '../modals/modalTemplate';
 import Confetti from 'react-confetti';
 
