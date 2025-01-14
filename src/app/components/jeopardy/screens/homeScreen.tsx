@@ -5,8 +5,8 @@ import LoadingText from '../../loadingText';
 import DiscoverBoards from '../discoverBoards';
 import posthog from 'posthog-js';
 import HowToPlayModal from '../modals/instructionsModal';
-import YoutubeInput from '../../YoutubeInput';
 import Navbar from '../../Navbar';
+import YoutubeInput from '../YoutubeInput';
 
 interface UploadedFile extends File {
     content?: string;

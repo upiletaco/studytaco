@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Home, Send, X, Play, Copy, Facebook, Linkedin, Twitter } from 'lucide-react';
+import { Send, X, Play, Copy, Facebook, Linkedin, Twitter } from 'lucide-react';
 import { getSupabase } from '@/app/services/supabaseClient';
 import { User } from '@supabase/supabase-js';
-import { useRouter } from 'next/router';
 import { updateWwbmHighScore } from '@/app/services/wwbmService';
 
 export interface WwbmGameOverProps{
@@ -18,10 +17,7 @@ const CongratsPage: React.FC<WwbmGameOverProps> = ({ score, resetGame, link, tit
     const [user, setUser] = useState<User | null>(null);
     const [copied, setCopied] = useState(false);
 
-    const router = useRouter()
-    const handleGoHome = () => {
-        router.push('/millionaire/home')
-    }
+
     const supabase = getSupabase()
 
 
@@ -237,7 +233,7 @@ const CongratsPage: React.FC<WwbmGameOverProps> = ({ score, resetGame, link, tit
                         </div>
                         <span className="text-white text-sm">Play Again</span>
                     </button>
-                    
+
                     <button className="flex flex-col items-center">
                         <div className="bg-orange-300 p-4 rounded-xl mb-2">
                             <Send className="w-6 h-6 text-white" />

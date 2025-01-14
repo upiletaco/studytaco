@@ -1,5 +1,5 @@
+import { GenerateButtonProps } from '@/app/util/wwbm.types';
 import React from 'react'
-import { GenerateButtonProps } from '../util/wwbm.types'
 
 
 const GenerateButton : React.FC<GenerateButtonProps> = ({ 
