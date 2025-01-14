@@ -16,7 +16,7 @@ export const StreakPopup = ({ show }: StreakPopupProps) => {
         <div className="relative z-10 flex flex-col items-center">
           <GiChiliPepper className="w-16 h-16 text-orange-500 mb-4" />
           <div className="w-fit bg-white px-6 py-2 rounded-full mb-2 text-center border-2 border-blue-100">
-            <span className="text-black text-2xl font-bold">You're so spicy!</span>
+            <span className="text-black text-2xl font-bold">You are so spicy!</span>
           </div>
         </div>
       </Card>
