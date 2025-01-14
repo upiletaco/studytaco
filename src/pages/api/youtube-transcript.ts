@@ -19,7 +19,7 @@ export default async function handler(
         const url = new URL('https://youtube-transcripts.p.rapidapi.com/youtube/transcript');
         url.searchParams.append('url', videoUrl);
         url.searchParams.append('chunkSize', '500');
-        // url.searchParams.append('lang', lang)
+        url.searchParams.append('lang', 'en')
     
         console.log(apiKey)
         console.log(url.toString())

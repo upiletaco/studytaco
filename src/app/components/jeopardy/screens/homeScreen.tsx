@@ -1,12 +1,12 @@
 import { Category, JeopardyData, Question, AIJeopardyProps } from '@/app/data/sampleBoardData';
 import React, { useState } from 'react';
-import { extractTextFromFile } from '../../services/extractText';
-import LoadingText from '../loadingText';
+import { extractTextFromFile } from '../../../services/extractText';
+import LoadingText from '../../loadingText';
 import DiscoverBoards from '../discoverBoards';
 import posthog from 'posthog-js';
 import HowToPlayModal from '../modals/instructionsModal';
+import Navbar from '../../Navbar';
 import YoutubeInput from '../YoutubeInput';
-import Navbar from '../Navbar';
 
 interface UploadedFile extends File {
     content?: string;

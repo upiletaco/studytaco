@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { LogIn, LogOut, UserIcon } from 'lucide-react';
 import { getSupabase } from '../services/supabaseClient';
-import Modal from './modals/modalTemplate';
+import Modal from './jeopardy/modals/modalTemplate';
 import { User } from '@supabase/supabase-js';
 
 export default function UserMenu() {

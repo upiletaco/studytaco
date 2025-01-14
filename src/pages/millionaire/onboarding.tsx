@@ -1,4 +1,4 @@
-import WwbmOnboardingSlides from "@/app/components/WwbmOnboardingSlides";
+import WwbmOnboardingSlides from "@/app/components/wwbm/WwbmOnboardingSlides";
 
 
 const WelcomePage = () => {

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
+import { JeopardyData } from '../../../data/sampleBoardData';
+import HomeScreen from './homeScreen';
+import EditScreen from './editScreen';
+import PlayScreen from './playScreen';
 import { useRouter } from 'next/router';
-import { JeopardyData } from '@/app/data/sampleBoardData';
-import EditScreen from '../jeopardy/screens/editScreen';
-import HomeScreen from '../jeopardy/screens/homeScreen';
-import PlayScreen from '../jeopardy/screens/playScreen';
 
 
 

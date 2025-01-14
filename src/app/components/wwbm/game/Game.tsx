@@ -5,17 +5,17 @@ import { Option, QuestionData } from '@/pages/millionaire/play/[name]/[id]'
 import MillionaireTitleBar from './TitleBar';
 import QuestionCard from './QuestionCard';
 import GameLifelineButtons from './LifelineButtons';
-import FiftyFiftyModal from './FiftyFiftyModal';
-import PhoneModal from './PhoneModal';
-import FollowUpFriendModal from './FollowUpFriendModal';
-import AudienceModal from './AudienceModal';
+import FiftyFiftyModal from './modals/FiftyFiftyModal';
+import PhoneModal from './modals/PhoneModal';
+import FollowUpFriendModal from './modals/FollowUpFriendModal';
+import AudienceModal from './modals/AudienceModal';
 import LivesDisplay from './LivesDisplay';
-import { StreakPopup } from './StreakPopup';
+import { StreakPopup } from './modals/StreakPopup';
 import { addExperience, updateLeaderboardEntry } from '@/app/services/wwbmService';
 import { getSupabase } from '@/app/services/supabaseClient';
 import LoadingQuestionCard from './LoadingQuestionCard';
 import GameLeaderboard from './GameLeaderboard';
-import { RankChangePopup } from './RankChangePopup';
+import { RankChangePopup } from './modals/RankChangePopup';
 
 export interface PlayWwbmProps {
     title: string,

@@ -3,10 +3,8 @@ import React from 'react';
 const OnboardingInstructions = () => {
   return (
     <div className="bg-white rounded-xl w-full max-w-2xl flex flex-col">
-      {/* Header */}
       
 
-      {/* Content */}
       <div className="overflow-y-auto">
         <div className="p-6 text-gray-600 space-y-6">
          

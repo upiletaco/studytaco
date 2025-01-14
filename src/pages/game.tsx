@@ -1,4 +1,4 @@
-import NavHandler from "@/app/components/screens/navHandler";
+import NavHandler from "@/app/components/jeopardy/screens/navHandler";
 
 
 const BasePage = () => {
