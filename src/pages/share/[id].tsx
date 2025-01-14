@@ -1,4 +1,4 @@
-import PlayScreen from '@/app/components/screens/playScreen';
+import PlayScreen from '@/app/components/jeopardy/screens/playScreen';
 import { Category } from '@/app/data/sampleBoardData';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react'

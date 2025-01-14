@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/router';
-import Modal from '../modals/modalTemplate';
+import Modal from '../jeopardy/modals/modalTemplate';
 import { EditScreenProps, ValidationErrors, WwbmQuestion } from '@/app/util/wwbm.types';
 import WWbmEditableHeader from './WwbmEditableHeader';
 import { getSupabase } from '@/app/services/supabaseClient';

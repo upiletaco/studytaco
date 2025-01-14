@@ -1,4 +1,4 @@
-import { Flame } from 'lucide-react';
+import { GiChiliPepper } from "react-icons/gi";
 
 interface StreakCounterProps {
   streak: number;
@@ -9,7 +9,7 @@ export const StreakCounter = ({ streak }: StreakCounterProps) => {
   
   return (
     <div className="flex items-center gap-1">
-      <Flame className="w-6 h-6 text-orange-500" />
+      <GiChiliPepper className="w-6 h-6 text-orange-500" />
       <span className="font-bold">{streak}</span>
     </div>
   );
