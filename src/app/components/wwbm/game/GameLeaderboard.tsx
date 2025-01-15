@@ -28,31 +28,10 @@ interface GameLeaderboardProps {
 
     useEffect(() => {
         updatePlayers(currentScore);
-    }, [currentScore, updatePlayers]);
+    }, [currentScore]);
 
 
 
-
-    // useEffect(() => {
-    //     // Check for rank change
-    //     const currentRank = players.find(p => p.user_id === userId)?.rank || null;
-        
-    //     // Only trigger rank change if we have both ranks and they're different
-    //     if (previousRank !== null && 
-    //         currentRank !== null && 
-    //         currentRank !== previousRank) {
-    //         // Always call onRankChange if it exists and ranks are different
-    //         if (onRankChange) {
-    //             onRankChange(currentRank);
-    //         }
-    //     }
-        
-    //     // Always update the previous rank
-    //     setPreviousRank(currentRank);
-    // }, [players, userId, previousRank, onRankChange]);
-  
-  
-  
       return (
           <Leaderboard 
               players={players} 

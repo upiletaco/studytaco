@@ -68,7 +68,8 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
         }
         
         setPreviousRank(currentRank);
-    }, [players, userId]);
+    }, [players, userId, score]);
+
     useEffect(() => {
         const fetchUser = async () => {
             const { data: { user } } = await supabase.auth.getUser();
@@ -338,6 +339,8 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
 
 
 
+
+
     const updatePlayers = (currentScore: number) => {
         if (!leaderboardId) return;
 
@@ -375,6 +378,10 @@ const Game: React.FC<PlayWwbmProps> = ({ questions: propQuestions, title, link }
 
         setPlayers(allPlayers);
     };
+
+    useEffect(() => {
+        updatePlayers(score);
+    }, [score]);
 
     if (gameOver == true) return (
         <CongratsPage isCorrect={isCorrect} score={score} correctAnswers={correctAnswers} resetGame={resetGame} link={link} title={title} />

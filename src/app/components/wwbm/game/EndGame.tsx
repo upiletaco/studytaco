@@ -16,10 +16,27 @@ export interface WwbmGameOverProps{
 const CongratsPage: React.FC<WwbmGameOverProps> = ({ score, resetGame, link, title }) => {
     const [user, setUser] = useState<User | null>(null);
     const [copied, setCopied] = useState(false);
+    const [timeLeft, setTimeLeft] = useState<number>(30)
+    const [isRunning, setIsRunning] = useState(true);
 
 
     const supabase = getSupabase()
 
+
+
+    useEffect(() => {
+
+        if(isRunning && timeLeft > 0){
+            setInterval(() => {
+                setTimeLeft((prevTime) => prevTime - 1)
+                }, 1000)
+        } else {
+            setIsRunning(false)
+        }
+
+
+
+    }, [])
 
     const handleCopy = async () => {
         try {
@@ -30,6 +47,10 @@ const CongratsPage: React.FC<WwbmGameOverProps> = ({ score, resetGame, link, tit
             console.error('Failed to copy text: ', err);
         }
     };
+
+    const setTimer = () => {
+
+    }
 
     const handleSocialShare = (platform: string) => {
         const text = `I scored ${score} points playing ${title}! Try to beat my score!`;
@@ -74,38 +95,29 @@ const CongratsPage: React.FC<WwbmGameOverProps> = ({ score, resetGame, link, tit
 
     if (!user) return (
         <div className="relative min-h-screen bg-blue-600 flex flex-col items-center justify-center p-6">
-            {/* Background gradient effect */}
             <div className="absolute inset-0 bg-gradient-to-b from-blue-500 to-blue-700" />
 
-            {/* Close button */}
             <button className="absolute top-6 right-6 bg-white/20 p-2 rounded-lg z-10">
                 <X className="w-6 h-6 text-white" />
             </button>
 
-            {/* Content container */}
             <div className="relative z-10 flex flex-col items-center max-w-md w-full">
-                {/* Profile section */}
 
 
-                {/* Congratulation text */}
                 <h1 className="text-white text-3xl font-bold mb-2 flex items-center gap-2">
                     CONGRATS <span className="text-2xl">🎉</span>
                 </h1>
 
-                {/* Username */}
 
 
-                {/* Points */}
                 <div className="bg-white/20 px-8 py-2 rounded-full mb-6">
                     <span className="text-white text-lg font-semibold">{score} pt</span>
                 </div>
 
-                {/* Share text */}
                 <p className="text-white/80 text-center mb-12">
                     Share your achivement 😎
                 </p>
 
-                {/* Navigation buttons */}
                 <div className="flex gap-6 w-full justify-center">
                    
 
@@ -133,17 +145,12 @@ const CongratsPage: React.FC<WwbmGameOverProps> = ({ score, resetGame, link, tit
 
     return (
         <div className="relative min-h-screen bg-blue-600 flex flex-col items-center justify-center p-6">
-            {/* Background gradient effect */}
             <div className="absolute inset-0 bg-gradient-to-b from-blue-500 to-blue-700" />
 
 
-            {/* Content container */}
             <div className="relative z-10 flex flex-col items-center max-w-md w-full">
-                {/* Profile section */}
                 <div className="relative mb-8">
 
-
-                    {/* Profile circle */}
                     <div className="relative mb-10">
                         <div className="w-24 h-24 rounded-full bg-cyan-400 flex items-center justify-center">
                             <img
@@ -152,29 +159,24 @@ const CongratsPage: React.FC<WwbmGameOverProps> = ({ score, resetGame, link, tit
                                 className="w-20 h-20 rounded-full object-cover"
                             />
                         </div>
-                        {/* Crown badge */}
                         <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-transparent p-2 rounded-full">
                             👑
                         </div>
                     </div>
                 </div>
 
-                {/* Congratulation text */}
                 <h1 className="text-white text-3xl font-bold mb-2 flex items-center gap-2">
                     CONGRATS <span className="text-2xl">🎉</span>
                 </h1>
 
-                {/* Username */}
                 <p className="text-orange-300 text-xl font-semibold mb-4">
                     {full_name}
                 </p>
 
-                {/* Points */}
                 <div className="bg-white/20 px-8 py-2 rounded-full mb-6">
                     <span className="text-white text-lg font-semibold">{score} pt</span>
                 </div>
 
-                {/* Share text */}
                 <p className="text-white/80 text-center mb-12">
                     Share your achivement  😎
                 </p>
@@ -223,7 +225,6 @@ const CongratsPage: React.FC<WwbmGameOverProps> = ({ score, resetGame, link, tit
                     </div>
                 </div>
 
-                {/* Navigation buttons */}
                 <div className="flex gap-6 w-full justify-center">
                     
 
