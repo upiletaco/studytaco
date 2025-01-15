@@ -48,9 +48,6 @@ const CongratsPage: React.FC<WwbmGameOverProps> = ({ score, resetGame, link, tit
         }
     };
 
-    const setTimer = () => {
-
-    }
 
     const handleSocialShare = (platform: string) => {
         const text = `I scored ${score} points playing ${title}! Try to beat my score!`;
